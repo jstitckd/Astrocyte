@@ -17,6 +17,6 @@ Cabin cards use the existing synthetic `testing.py` scenario when the weather CS
 
 Crew summaries read the latest rows of `data/alex.csv`, `data/petrov.csv` and their corresponding `_30days.csv` files. The ring is the CSV's sleep score, not a calculated overall health score. All current crew files are synthetic. Heart rate and SpO₂ are the latest daily measurements; HRV and sleep score are the latest recovery record.
 
-Sample tasks are assigned to a crew member and habitat area in `SAMPLE_TASKS`. Click a map notification to reveal the assigned tasks, then choose **Mark complete**. Completed tasks disappear from the map and the counts update. Completion persists through navigation in the same Streamlit session. New sessions start with all sample tasks. There is no shared task database, email or push notification service.
+Sample tasks are assigned to a crew member and habitat area in `SAMPLE_TASKS`. Assigned tasks and **Mark complete** buttons appear inside each crew health card above the map. Clicking a map notification highlights its task in the corresponding crew card. Completed tasks disappear from the map and the counts update. Completion persists through navigation in the same Streamlit session. New sessions start with all sample tasks. There is no shared task database, email or push notification service.
 
-Building clicks still open the existing habitat pages. The crew summary buttons open Alex and Petrov's existing pages. The map stays unboxed; the crew panel stacks below it on narrow screens.
+Building clicks still open the existing habitat pages. The crew summary buttons open Alex and Petrov's existing pages. The map stays unboxed, with the environment readings in a column on its right.

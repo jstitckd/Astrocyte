@@ -7,6 +7,40 @@
   let selected = null;
   let disabled = false;
 
+  // Connect cards to explicit roof points, accounting for responsive SVG scaling.
+  function drawTaskConnectors() {
+    const scene = document.querySelector(".scene");
+    const bounds = scene.getBoundingClientRect();
+    const overlay = document.querySelector(".task-connectors");
+    overlay.replaceChildren();
+    overlay.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
+    const svgElement = (tag, attributes) => {
+      const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+      overlay.append(element);
+    };
+    document.querySelectorAll(".task-marker").forEach(marker => {
+      const building = buildings.find(item => item.dataset.area === marker.dataset.area);
+      const anchor = building?.querySelector(".task-anchor");
+      const matrix = anchor?.getScreenCTM();
+      if (!matrix) return;
+      const point = new DOMPoint(anchor.cx.baseVal.value, anchor.cy.baseVal.value).matrixTransform(matrix);
+      const end = {x: point.x - bounds.left, y: point.y - bounds.top};
+      const horizontal = marker.dataset.area === "exercise";
+      if (horizontal) marker.style.top = `${end.y - marker.offsetHeight / 2}px`;
+      const card = marker.getBoundingClientRect();
+      const start = horizontal
+        ? {x: card.right - bounds.left, y: card.top + card.height / 2 - bounds.top}
+        : {x: card.left + card.width / 2 - bounds.left, y: card.bottom - bounds.top};
+      const middleY = (start.y + end.y) / 2;
+      const path = horizontal ? `M${start.x},${start.y} L${end.x},${end.y}`
+        : `M${start.x},${start.y} V${middleY} H${end.x} V${end.y}`;
+      const urgent = marker.classList.contains("urgent") ? " urgent" : "";
+      svgElement("path", {class: "task-connector" + urgent, d: path});
+      svgElement("circle", {class: "task-endpoint" + urgent, cx: end.x, cy: end.y, r: 4.5});
+    });
+  }
+
   function renderTasks(tasks) {
     const layer = document.getElementById("task-markers");
     layer.replaceChildren();
@@ -16,6 +50,7 @@
       if (!areas.has(task.area)) return;
       const marker = document.createElement("button");
       marker.className = "task-marker task-" + task.area + (task.urgent ? " urgent" : "");
+      marker.dataset.area = task.area;
       marker.disabled = disabled;
       marker.setAttribute("aria-label", `${task.crew}: ${task.title}, due ${task.due}. View assigned tasks`);
       for (const [tag, text] of [["strong", `${task.crew} · ${task.title}`], ["span", task.detail], ["small", `Due ${task.due}`]]) {
@@ -29,11 +64,15 @@
       });
       layer.append(marker);
     });
+    requestAnimationFrame(drawTaskConnectors);
   }
 
   // The map is an iframe. These messages are the bridge back to Streamlit.
   const send = (type, payload = {}) => window.parent.postMessage({isStreamlitMessage: true, type, ...payload}, "*");
-  const resize = () => send("streamlit:setFrameHeight", {height: Math.ceil(document.querySelector(".map-shell").getBoundingClientRect().height) + 4});
+  const resize = () => {
+    drawTaskConnectors();
+    send("streamlit:setFrameHeight", {height: Math.ceil(document.querySelector(".map-shell").getBoundingClientRect().height) + 4});
+  };
 
   function selectArea(id) {
     const area = areas.get(id);
