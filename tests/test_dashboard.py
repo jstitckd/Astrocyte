@@ -14,10 +14,12 @@ class DashboardTests(unittest.TestCase):
         markup = "\n".join(item.proto.body for item in app.get("html"))
         self.assertEqual(markup.count('class="dash-metric"'), 5)
         self.assertIn("Cabin O₂", markup)
-        self.assertIn("Recorded weather", markup)
+        self.assertNotIn("Recorded weather", markup)
+        self.assertNotIn('class="dash-outside"', markup)
+        self.assertNotIn("<small>Demo</small>", markup)
         self.assertIn("Sleep score", markup)
-        self.assertIn("Synthetic telemetry", markup)
-        self.assertEqual(len(app.button), 6)  # Four navigation + two crew links.
+        self.assertNotIn("Synthetic telemetry", markup)
+        self.assertEqual(len([button for button in app.button if button.key.startswith("complete_")]), 3)
 
     def test_task_notification_completion_and_navigation_persist(self):
         app = AppTest.from_file(str(ROOT / "app.py")).run()
@@ -25,7 +27,7 @@ class DashboardTests(unittest.TestCase):
         app.run()
         self.assertFalse(app.exception)
         self.assertEqual(app.session_state.page, "home")
-        self.assertTrue(app.session_state.show_habitat_tasks)
+        self.assertEqual(app.session_state.selected_habitat_task, "medical-check")
         app.button(key="complete_medical-check").click().run()
         self.assertFalse(app.exception)
         self.assertIn("medical-check", app.session_state.completed_habitat_tasks)

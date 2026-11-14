@@ -45,7 +45,6 @@ def render_base_map(tasks=None):
     st.session_state.last_map_event = event_id
     task_id = event.get("task")
     if isinstance(task_id, str) and task_id in {task["id"] for task in (tasks or [])}:
-        st.session_state.show_habitat_tasks = True
-        st.session_state.habitat_tasks_toggle = True
+        st.session_state.selected_habitat_task = task_id
         st.rerun()
     return area_id

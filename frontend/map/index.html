@@ -10,7 +10,6 @@
 <main class="map-shell">
   <header class="map-header">
     <div>
-      <span class="eyebrow">YOUR OUTPOST · TASK LOCATIONS</span>
       <h2>Mars outpost habitat map</h2>
     </div>
     <div class="map-header-actions"><span id="task-count" class="task-count"></span><span class="map-instructions" id="map-instructions">Hover to explore</span></div>
@@ -18,6 +17,7 @@
 
   <div class="map-layout">
     <div class="scene">
+      <svg class="task-connectors" aria-hidden="true"></svg>
       <div id="task-markers" aria-label="Assigned habitat tasks"></div>
       <!-- Original SVG scene. Each data-area matches HABITAT_AREAS in models/areas.py. -->
       <svg class="habitat-scene" viewBox="0 0 1240 790" role="group" aria-labelledby="map-title map-description" xmlns="http://www.w3.org/2000/svg">
@@ -93,6 +93,7 @@
 
         <!-- 03: separate laboratory and workshop, a dish and a small rover. -->
         <g class="building" data-area="science" tabindex="0" role="button" transform="translate(708 188)">
+          <circle class="task-anchor" cx="160" cy="48" r="0"/>
           <path class="selection-pad" d="m-15 153 133-72 146 76-132 76Z"/>
           <g class="structure" filter="url(#structure-shadow)">
             <use href="#cabin" x="85" y="1" width="154" height="131"/>
@@ -108,6 +109,7 @@
 
         <!-- 01: a larger, three-module crew hub with a communications mast. -->
         <g class="building" data-area="living" tabindex="0" role="button" transform="translate(425 225)">
+          <circle class="task-anchor" cx="150" cy="45" r="0"/>
           <path class="selection-pad" d="m-9 166 144-77 156 82-146 81Z"/>
           <g class="structure" filter="url(#structure-shadow)">
             <use href="#cabin" x="78" y="-12" width="164" height="139"/>
@@ -136,6 +138,7 @@
 
         <!-- 04: a longer training module, with panoramic windows and a roof marker. -->
         <g class="building" data-area="exercise" tabindex="0" role="button" transform="translate(292 384)">
+          <circle class="task-anchor" cx="110" cy="74" r="0"/>
           <path class="selection-pad" d="m-10 132 105-56 149 79-106 60Z"/>
           <g class="structure" filter="url(#structure-shadow)">
             <path d="m4 69 88-47 134 70-89 49Z" fill="url(#roof)" stroke="#bfae8d"/>
@@ -186,7 +189,6 @@
 
         <g class="compass" transform="translate(1125 670)"><path d="M0 27V-10m0 0-5 9m5-9 5 9M-12 27h24"/><text x="0" y="-20">N</text></g>
       </svg>
-      <div class="scene-key"><span><i class="key-tunnel"></i>Habitat links</span><span><i class="key-service"></i>Surface access</span><span><i class="key-power"></i>Power conduit</span><span class="schematic-note">Concept schematic · Not to scale</span></div>
     </div>
 
   </div>
