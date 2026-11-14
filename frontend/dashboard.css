@@ -17,6 +17,11 @@
 .crew-compact-vitals {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:8px 0 4px;}
 .crew-compact-vitals span {font-size:10px;color:var(--dash-muted);}
 .crew-compact-vitals b {display:block;font-size:14px;font-weight:600;color:#ecede6;white-space:nowrap;}
+.crew-health-row {display:flex;align-items:center;gap:12px;margin-top:6px;}
+.crew-health-row .crew-compact-vitals {flex:1;min-width:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 10px;margin:0;}
+.crew-health-gauge {position:relative;width:64px;height:64px;flex:none;display:grid;place-items:center;border-radius:50%;isolation:isolate;}
+.crew-health-gauge::before {content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--health-colour) 0deg var(--health-angle),#293137 var(--health-angle) 360deg);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5.5px));mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5.5px));}
+.crew-health-gauge strong {font-size:20px;font-weight:750;line-height:1;font-variant-numeric:tabular-nums;}
 .st-key-crew_overview [class*="st-key-crew_task_"], .st-key-crew_overview [class*="st-key-task_selected_"] {padding:3px 8px;border-radius:6px;}
 .crew-task-line {display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;line-height:1.3;}
 .crew-task-line strong {font-weight:500;}.crew-task-line span {color:var(--brand-accent);white-space:nowrap;}
@@ -24,6 +29,11 @@
 .st-key-crew_overview [data-testid="stButton"] button p {font-size:11px;}
 /* A transparent native button covers the card; task controls sit above it. */
 .st-key-crew_overview [class*="st-key-crew_card_"] {position:relative;cursor:pointer;}
+.st-key-crew_overview [data-testid="stHorizontalBlock"]:has([class*="st-key-crew_card_"]) {align-items:stretch;}
+.st-key-crew_overview [data-testid="stColumn"]:has([class*="st-key-crew_card_"]) {display:flex;align-self:stretch;}
+.st-key-crew_overview [data-testid="stColumn"]:has([class*="st-key-crew_card_"]) > [data-testid="stVerticalBlock"] {flex:1;}
+.st-key-crew_overview [data-testid="stLayoutWrapper"]:has(> [class*="st-key-crew_card_"]) {flex:1;}
+.st-key-crew_overview [class*="st-key-crew_card_"] {flex:1;}
 .st-key-crew_overview [class*="st-key-crew_card_"] > [data-testid="stVerticalBlock"] {position:static;}
 .st-key-crew_overview [class*="st-key-summary_"] {position:absolute;inset:0;width:100%;height:100%;z-index:1;}
 .st-key-crew_overview [class*="st-key-summary_"] [data-testid="stButton"] {height:100%;}

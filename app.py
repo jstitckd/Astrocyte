@@ -4,8 +4,9 @@ from pathlib import Path
 import streamlit as st
 
 from components.sidebar import render_sidebar
-from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing, Alex, Petrov, Amara
+from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing, Alex, Petrov, Amara, Milou
 from views import greenhouse, launch, life_support, living, power, science, Petrov
+from views import task_guide
 
 ROOT = Path(__file__).resolve().parent
 
@@ -21,6 +22,7 @@ st.html(f"<style>{styles}\n:root{{--brand-accent:{accent};}}</style>")
 
 # Each destination has its own file so teammates can edit independently.
 VIEWS = {
+    "task_guide": task_guide.render,
     "home": home.render,
     "sleep": sleep.render,
     "exercise": exercise.render,
@@ -32,6 +34,7 @@ VIEWS = {
     "data": data.render,
     "Alex": Alex.render,
     "Amara": Amara.render,
+    "Milou": Milou.render,
     "Petrov": Petrov.render
 }
 

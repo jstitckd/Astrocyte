@@ -1,12 +1,12 @@
 """Shared branding and navigation. Page content belongs in views/."""
 
 import base64
-import re
 from pathlib import Path
 
 import streamlit as st
 
 from models.astronauts import Astronauts
+from services.crew_health import health_score as _health_score, score_colour as _score_colour
 
 
 LOGO_PATH = (
@@ -50,35 +50,6 @@ def _brand_mark():
 
 def go(page):
     st.session_state.page = page
-
-
-def _health_score(astronaut):
-    """Read the score currently stored in astronaut.icon."""
-    match = re.search(r"-?\d+(?:\.\d+)?", str(astronaut.icon))
-    if match is None:
-        return None
-
-    return max(0.0, min(100.0, float(match.group())))
-
-
-def _score_colour(score):
-    """Smoothly interpolate red -> yellow -> green."""
-    stops = (
-        (0, (239, 101, 101)),
-        (50, (232, 200, 108)),
-        (100, (102, 201, 143)),
-    )
-
-    for (low, start), (high, end) in zip(stops, stops[1:]):
-        if score <= high:
-            fraction = (score - low) / (high - low)
-            channels = [
-                round(a + (b - a) * fraction)
-                for a, b in zip(start, end)
-            ]
-            return "#{:02x}{:02x}{:02x}".format(*channels)
-
-    return "#66c98f"
 
 
 def _inject_sidebar_styles():
@@ -339,7 +310,7 @@ def render_sidebar():
         )
 
         st.divider()
-        _nav("home", "⌂   Base overview")
+        _nav("home", "⌂   Dashboard")
         st.divider()
 
         st.markdown(

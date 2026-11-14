@@ -13,6 +13,6 @@ Astronauts = {
     "Alex": Astronaut("Alex Vance", "76", "Pilot"),
     "Petrov": Astronaut("Petrov Volkov", "90", "Commander"),
     "Amara": Astronaut("Dr. Amara Okafor", "97" ,"Medical Officer"),
-    # "Three": Astronaut("Kitchen", "◒"),
+    "Milou": Astronaut("Milou de Jong", "0", "Lead Engineer"),
     # "Four": Astronaut("Greenhouse / common room", "❋"),
 }

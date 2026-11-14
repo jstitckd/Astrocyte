@@ -52,7 +52,7 @@
       marker.className = "task-marker task-" + task.area + (task.urgent ? " urgent" : "");
       marker.dataset.area = task.area;
       marker.disabled = disabled;
-      marker.setAttribute("aria-label", `${task.crew}: ${task.title}, due ${task.due}. View assigned tasks`);
+      marker.setAttribute("aria-label", `${task.crew}: ${task.title}, due ${task.due}. Open task guide`);
       for (const [tag, text] of [["strong", `${task.crew} · ${task.title}`], ["span", task.detail], ["small", `Due ${task.due}`]]) {
         const line = document.createElement(tag);
         line.textContent = text;

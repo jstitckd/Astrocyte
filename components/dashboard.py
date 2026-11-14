@@ -3,6 +3,7 @@ from html import escape
 
 import streamlit as st
 from services.dashboard import complete_task
+from services.crew_health import score_colour
 
 
 def environmental_cards(snapshot):
@@ -13,7 +14,7 @@ def environmental_cards(snapshot):
         value = "—" if reading.value is None else f"{reading.value:,.{digits}f}"
         source = {"demo": "", "csv": "Recorded", "missing": "Not measured"}[reading.source]
         source_label = f"<small>{source}</small>" if source else ""
-        cards.append(f'<article class="dash-metric"><div class="dash-metric-top"><span class="dash-icon">{icon}</span>{label}{source_label}</div><div class="dash-number">{value} <span>{escape(reading.unit)}</span></div></article>')
+        cards.append(f'<article class="dash-metric"><div class="dash-metric-top"><span class="dash-icon">{icon}</span>{label}{source_label}</div><div class="dash-number">{value} <span>{escape(reading.unit)}</span></div></div></article>')
     st.html('<section class="dash-metrics" aria-label="Environmental and cabin readings">' + ''.join(cards) + '</section>')
 
 
@@ -23,8 +24,12 @@ def crew_card(crew, tasks):
     count = len(assigned)
     status = f'{count} task{"s" if count != 1 else ""} due' if count else "Tasks clear"
     tone = "amber" if any(task["crew"] == name and task["urgent"] for task in tasks) else "green"
+    score = crew["health_score"]
+    score_text = f"{score:g}%" if score is not None else "—"
+    colour = score_colour(score) if score is not None else "#8a959d"
+    gauge = f'<div class="crew-health-gauge" role="img" aria-label="Health score {score_text}" style="--health-colour:{colour};--health-angle:{(score or 0) * 3.6:.2f}deg"><strong>{score_text}</strong></div>'
     with st.container(border=True, key=f"crew_card_{name}"):
-        st.html(f'''<article class="crew-summary"><div class="crew-top"><h3>{name}</h3><span class="crew-status {tone}">{status}</span></div><div class="crew-compact-vitals"><span>Sleep score <b>{crew['sleep_score']}/100</b></span><span>Heart rate <b>{crew['hr']} bpm</b></span><span>SpO₂ <b>{crew['spo2']:.0f}%</b></span><span>HRV <b>{crew['hrv']:.0f} ms</b></span></div></article>''')
+        st.html(f'''<article class="crew-summary"><div class="crew-top"><h3>{name}</h3><span class="crew-status {tone}">{status}</span></div><div class="crew-health-row">{gauge}<div class="crew-compact-vitals"><span>Sleep score <b>{crew['sleep_score']}/100</b></span><span>Heart rate <b>{crew['hr']} bpm</b></span><span>SpO₂ <b>{crew['spo2']:.0f}%</b></span><span>HRV <b>{crew['hrv']:.0f} ms</b></span></div></div></article>''')
         if not assigned:
             st.success("All tasks completed.")
         for task in assigned:

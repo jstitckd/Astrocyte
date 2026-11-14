@@ -31,4 +31,4 @@ Hover or keyboard focus highlights a building. Clicking a building opens its pag
 
 On touch screens, tap a building to open its page directly. Reduced-motion preferences disable hover transitions.
 
-The component sends `{area, event_id}` to Python. The wrapper validates the habitat ID and rejects a replayed event, so returning home does not reopen the last selection. The seven target pages are title-only workspaces for the team. Existing crew navigation and old health pages are preserved.
+Building clicks send `{area, event_id}` to Python. Task cards send `{area, task, event_id}` and open the task learning page; `models/task_guides.py` holds the editable steps. The wrapper validates the habitat ID and rejects a replayed event, so returning home does not reopen the last selection. The seven target pages are title-only workspaces for the team. Existing crew navigation and old health pages are preserved.
