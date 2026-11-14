@@ -426,13 +426,9 @@ def render_circular_hero(summary: dict):
                 </div>
                 <div class="hero-details">
                     <div class="tile-top" style="margin-bottom: 10px;">
-                        <span class="tile-label">Astronaut {summary['astronaut']} · {summary['date']}, {summary['clock']} station time</span>
                         <span class="status-pill" style="background:{bg_col}; color:{solid_col};">
                             <span class="status-dot" style="background:{solid_col};"></span>{status_text}
                         </span>
-                    </div>
-                    <div class="tile-tip" style="margin-top: 0; min-height: 0;">
-                        Composite of nine live telemetry, 30-day recovery and monthly clinical metrics, scaled against your own mission baselines.
                     </div>
                     <div class="hero-pillars">
                         {pillar("30-day recovery", summary['recovery_pillar'], "HRV · sleep · VO₂ max")}
