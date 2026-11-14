@@ -1,0 +1,26 @@
+Time,Temperature_C,Pressure_Pa,UV_Index,UV_Risk_Level
+00:00,-70.0,506.5,0,Low risk
+01:00,-74.0,507.1,0,Low risk
+02:00,-77.0,506.1,0,Low risk
+03:00,-79.0,505.3,0,Low risk
+04:00,-80.0,505.1,0,Low risk
+05:00,-80.0,505.4,0,Low risk
+06:00,-77.0,506.7,0,Low risk
+07:00,-74.0,507.7,22,moderate risk
+08:00,-63.0,508.3,34,moderately high risk
+09:00,-53.0,507.7,43,moderately high risk
+10:00,-43.0,504.9,47,moderately high risk
+11:00,-37.5,503.5,50,moderately high risk
+12:00,-32.0,504.8,51,moderately high risk
+13:00,-28.0,505.5,50,moderately high risk
+14:00,-26.0,504.9,49,moderately high risk
+15:00,-25.0,504.3,43,moderately high risk
+16:00,-25.0,503.2,33,moderately high risk
+17:00,-28.0,502.5,15,moderate risk
+18:00,-38.0,502.6,0,Low risk
+19:00,-47.0,503.8,0,Low risk
+20:00,-55.0,507.2,0,Low risk
+21:00,-60.0,508.7,0,Low risk
+22:00,-64.0,506.3,0,Low risk
+23:00,-67.0,505.2,0,Low risk
+24:00,-70.0,506.5,0,Low risk

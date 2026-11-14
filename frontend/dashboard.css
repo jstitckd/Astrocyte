@@ -43,10 +43,13 @@
 .st-key-crew_overview [class*="st-key-crew_task_"], .st-key-crew_overview [class*="st-key-task_selected_"] {position:relative;z-index:2;cursor:default;}
 .dash-metric {background:linear-gradient(120deg,#1c2529,#192126);border:1px solid var(--dash-line);border-radius:12px;padding:15px 16px;min-width:0;}
 .dash-metric-top {display:flex;align-items:center;gap:8px;font-size:13px;white-space:nowrap;}
-.dash-icon {color:var(--brand-accent);font-size:21px;}
+.dash-icon {display:block;width:22px;height:22px;flex:0 0 22px;object-fit:contain;}
 .dash-metric-top small {margin-left:auto;font-size:9px;color:var(--dash-muted);}
 .dash-number {font-size:29px;line-height:1.4;font-weight:750;letter-spacing:-.8px;}
 .dash-number span {font-size:15px;font-weight:400;letter-spacing:0;}
+.dash-reading-row {display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.dash-reading-row .dash-number {white-space:nowrap;}
+.env-sparkline {display:block;width:84px;height:32px;flex:0 1 84px;min-width:48px;overflow:visible;color:var(--brand-accent);}
 .dash-outside {display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12px;color:#cbd1d2;padding:7px 1px 10px;}
 .dash-outside>span:last-child {margin-left:auto;color:var(--dash-muted);font-size:11px;}
 .dash-live-dot {width:6px;height:6px;background:#d093f6;border-radius:50%;}

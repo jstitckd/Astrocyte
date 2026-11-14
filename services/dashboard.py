@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from services.environment import DEFAULT_DATA_PATH, load_csv, take_snapshot
+from services.dashboard_weather import WEATHER_PATH, weather_snapshot
 from models.astronauts import Astronauts
 from services.crew_health import health_score
 
@@ -18,9 +18,8 @@ SAMPLE_TASKS = (
 
 @st.cache_data(show_spinner=False, ttl=30)
 def environmental_snapshot():
-    frame, schema = load_csv(DEFAULT_DATA_PATH.read_bytes())
-    row = frame.iloc[(frame["__hour"] - 12).abs().argsort().iloc[0]]
-    return take_snapshot(frame, schema, int(row["__sol"]), row["__time"])
+    """Load the selected readings and their compact chart histories."""
+    return weather_snapshot(WEATHER_PATH.read_bytes())
 
 
 @st.cache_data(show_spinner=False, ttl=30)

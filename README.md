@@ -54,7 +54,7 @@ The workspace also provides **Run and Debug → Run Astrocyte** (requires the Py
 
 ## Homepage environment
 
-Base overview shows five compact cabin readings, recorded outside conditions, the interactive habitat map with task notifications, and crew summaries on the right. Click a task marker to open assignments and mark them complete. Cabin and crew readings are labelled demo/synthetic data. Tasks persist in the current browser session. See [the homepage editing guide](docs/homepage-dashboard.md).
+The dashboard shows crew cards above the interactive habitat map, with environmental cards on its right. Outside temperature, pressure and UV index use `data/mars_diurnal_weather_radiation-v2.csv` at 12:00; cabin O₂ and CO₂ retain the synthetic scenario. Click a task marker to open its learning guide. Tasks persist in the current browser session. See [the homepage editing guide](docs/homepage-dashboard.md).
 
 ## Where to add your content
 

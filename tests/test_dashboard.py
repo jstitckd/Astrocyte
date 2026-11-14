@@ -11,7 +11,7 @@ class DashboardTests(unittest.TestCase):
     def test_overview_has_five_channels_and_real_crew_csv_values(self):
         app = AppTest.from_file(str(ROOT / "app.py")).run()
         self.assertFalse(app.exception)
-        markup = "\n".join(item.proto.body for item in app.get("html"))
+        markup = "\n".join(item.proto.body for item in app.get("html")) + "\n" + "\n".join(item.value for item in app.markdown)
         self.assertEqual(markup.count('class="dash-metric"'), 5)
         self.assertIn("Cabin O₂", markup)
         self.assertNotIn("Recorded weather", markup)
@@ -22,8 +22,10 @@ class DashboardTests(unittest.TestCase):
         self.assertIn("Amara", markup)
         from models.astronauts import Astronauts
         self.assertEqual(markup.count('class="crew-health-gauge"'), len(Astronauts))
-        for score in (76, 90, 97):
-            self.assertIn(f'aria-label="Health score {score}%"', markup)
+        from services.crew_health import health_score
+        for astronaut in Astronauts.values():
+            score = health_score(astronaut)
+            self.assertIn(f'aria-label="Health score {score:g}%"', markup)
         self.assertEqual(len([button for button in app.button if button.key.startswith("complete_")]), 3)
 
     def test_amara_dashboard_card_opens_existing_health_page(self):

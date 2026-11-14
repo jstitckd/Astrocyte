@@ -1,20 +1,33 @@
 """Compact homepage cards. Layout styles live in frontend/dashboard.css."""
 from html import escape
+import base64
 
 import streamlit as st
 from services.dashboard import complete_task
 from services.crew_health import score_colour
+from components.environment_sparkline import sparkline
+from components.environment_icons import environment_icon
+from services.environment_colours import environment_colour
 
 
 def environmental_cards(snapshot):
     cards = []
-    channels = [("cabin_radiation", "Radiation", "◈", 1), ("o2", "Cabin O₂", "◎", 1), ("co2", "Cabin CO₂", "♧", 0), ("cabin_temp", "Temperature", "♨", 1), ("cabin_pressure", "Pressure", "◴", 1)]
-    for key, label, icon, digits in channels:
+    channels = [("uv_index", "Radiation · UV", 0), ("air", "Outside temperature", 1), ("pressure", "Outside pressure", 1), ("o2", "Cabin O₂", 1), ("co2", "Cabin CO₂", 0)]
+    for key, label, digits in channels:
         reading = snapshot.readings[key]
+        colour, status = environment_colour(key, reading.value)
+        icon = environment_icon(key, colour)
         value = "—" if reading.value is None else f"{reading.value:,.{digits}f}"
         source = {"demo": "", "csv": "Recorded", "missing": "Not measured"}[reading.source]
         source_label = f"<small>{source}</small>" if source else ""
-        cards.append(f'<article class="dash-metric"><div class="dash-metric-top"><span class="dash-icon">{icon}</span>{label}{source_label}</div><div class="dash-number">{value} <span>{escape(reading.unit)}</span></div></div></article>')
+        chart = ""
+        if sum(value is not None for _, value in snapshot.history[key]) > 1:
+            svg = sparkline(snapshot.history[key], snapshot.time, label, reading.unit, key, colour)
+            encoded = base64.b64encode(svg.encode()).decode("ascii")
+            description = f"{label}: hourly CSV profile; selected {snapshot.time}"
+            chart = f'<img class="env-sparkline" alt="{escape(description, quote=True)}" title="{escape(description, quote=True)}" src="data:image/svg+xml;base64,{encoded}">'
+        description = escape(f"{label}: {value} {reading.unit}. {status}", quote=True)
+        cards.append(f'<article class="dash-metric" title="{escape(status, quote=True)}" aria-label="{description}"><div class="dash-metric-top">{icon}{label}{source_label}</div><div class="dash-reading-row"><div class="dash-number">{value} <span>{escape(reading.unit)}</span></div>{chart}</div></article>')
     st.html('<section class="dash-metrics" aria-label="Environmental and cabin readings">' + ''.join(cards) + '</section>')
 
 
