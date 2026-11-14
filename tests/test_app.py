@@ -36,7 +36,9 @@ class NavigationTests(unittest.TestCase):
                 self.assertFalse(app.exception)
                 self.assertEqual([item.value for item in app.main.title], [title])
                 if page_id != "home":
-                    self.assertEqual(len(app.main.markdown), 0)
+                    # The shared sidebar injects a style block into the main tree.
+                    content = [item for item in app.main.markdown if not item.value.lstrip().startswith("<style>")]
+                    self.assertEqual(len(content), 0)
                     self.assertEqual(len(app.metric), 0)
                     self.assertEqual(len(app.get("file_uploader")), 0)
                     self.assertEqual(len(app.get("download_button")), 0)
