@@ -10,9 +10,9 @@ class Astronaut:
 
 
 Astronauts = {
-    "Alex": Astronaut("Alex Vance", "76", "Pilot"),
+    "Alex": Astronaut("Alex Vance", "66", "Pilot"),
     "Petrov": Astronaut("Petrov Volkov", "90", "Commander"),
-    "Amara": Astronaut("Dr. Amara Okafor", "97" ,"Medical Officer"),
-    "Milou": Astronaut("Milou de Jong", "0", "Lead Engineer"),
+    "Amara": Astronaut("Dr. Amara Okafor", "93" ,"Medical Officer"),
+    "Milou": Astronaut("Milou de Jong", "77", "Lead Engineer"),
     # "Four": Astronaut("Greenhouse / common room", "❋"),
 }
