@@ -339,7 +339,7 @@ def render_sidebar():
         )
 
         st.divider()
-        _nav("home", "⌂   Base overview")
+        _nav("home", "⌂   Dashboard")
         st.divider()
 
         st.markdown(
