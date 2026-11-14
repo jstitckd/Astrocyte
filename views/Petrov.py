@@ -899,7 +899,7 @@ def render():
         age=98,
         height_cm=222,
         weight_kg=50.5,
-        health_score=0.3,
+        health_score=9.1,
         time_outside="02h 06m",
     )
     graphs()
