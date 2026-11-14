@@ -1,0 +1,8 @@
+/* Override profile-wide column rules only inside the header and dialogs. */
+[class*="st-key-astronaut_header_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;align-items:center!important;}
+[class*="st-key-astronaut_header_"] [data-testid="stColumn"] {min-width:0!important;}
+[class*="st-key-astronaut_header_"] [data-testid="stButton"] button {min-height:38px;border-color:#4e405c;font-size:12px;}
+[class*="st-key-astronaut_header_"] [data-testid="stButton"] button p {font-size:12px;white-space:nowrap;}
+[data-testid="stDialog"] [data-testid="stColumn"] {min-width:0!important;}
+[data-testid="stDialog"] [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;}
+[data-testid="stDialog"] [data-testid="stMetricValue"] {font-size:24px!important;}

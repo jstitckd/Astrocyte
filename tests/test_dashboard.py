@@ -20,7 +20,8 @@ class DashboardTests(unittest.TestCase):
         self.assertIn("Sleep score", markup)
         self.assertNotIn("Synthetic telemetry", markup)
         self.assertIn("Amara", markup)
-        self.assertEqual(markup.count('class="crew-health-gauge"'), 3)
+        from models.astronauts import Astronauts
+        self.assertEqual(markup.count('class="crew-health-gauge"'), len(Astronauts))
         for score in (76, 90, 97):
             self.assertIn(f'aria-label="Health score {score}%"', markup)
         self.assertEqual(len([button for button in app.button if button.key.startswith("complete_")]), 3)

@@ -1,5 +1,6 @@
 from pathlib import Path
 import streamlit as st
+from components.astronaut_controls import render_header_actions
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
@@ -25,7 +26,7 @@ def render_astronaut_header(
     flag_url = f"https://flagcdn.com/w40/{country_code.lower()}.png"
 
     header_html = f"""
-    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 48px; padding: 4px 0; font-family: sans-serif;">
+    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px; padding: 4px 0; font-family: sans-serif;">
         <!-- 1. Name, Flag & Demographics -->
         <div>
             <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #888888; margin-bottom: 4px;">
@@ -54,7 +55,7 @@ def render_astronaut_header(
             <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.8px; color: #fafafa; opacity: 0.75; margin-bottom: 4px;">
                 HEALTH SCORE
             </div>
-            <div style="font-size: 36px; font-weight: 400; color: {score_color}; line-height: 1.15;">
+            <div style="font-size: 30px; font-weight: 400; color: {score_color}; line-height: 1.15;">
                 {health_score:.1f}<span style="font-size: 20px; font-weight: 500; color: #888888;"> / 10</span>
             </div>
         </div>
@@ -64,15 +65,19 @@ def render_astronaut_header(
             <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.8px; color: #fafafa; opacity: 0.75; margin-bottom: 4px;">
                 TOTAL TIME OUTSIDE
             </div>
-            <div style="font-size: 36px; font-weight: 400; color: #fafafa; line-height: 1.15;">
+            <div style="font-size: 30px; font-weight: 400; color: #fafafa; line-height: 1.15;">
                 {time_outside}
             </div>
         </div>
     </div>
     """
 
-    with st.container(border=True):
-        st.html(header_html)
+    with st.container(border=True, key="astronaut_header_Amara"):
+        details, actions = st.columns([5, 1], gap="medium", vertical_alignment="center")
+        with details:
+            st.html(header_html)
+        with actions:
+            render_header_actions("Amara", health_score)
 
 def graphs():
     # ---------------------------------------------------------------------------
@@ -765,6 +770,7 @@ def graphs():
     df_day, df_30d, df_test, df_extra = [d.copy() for d in load_data()]
 
     health_summary = compute_composite_index(df_day, df_30d, df_test, df_extra)
+    st.session_state["health_summary_Amara"] = health_summary
     render_circular_hero(health_summary)
 
     # --- Section 1: live telemetry ---------------------------------------------
