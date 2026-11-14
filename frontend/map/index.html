@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Astrocyte interactive habitat</title>
+  <link rel="stylesheet" href="map.css">
+</head>
+<body>
+<main class="map-shell">
+  <div class="map-heading"><span><i></i> ARES OUTPOST <b>/</b> HABITAT MAP</span><span class="map-hint" id="hint">Hover to explore · Click to open</span></div>
+  <div class="drawing">
+    <svg viewBox="0 0 1120 590" role="group" aria-labelledby="map-title map-description" xmlns="http://www.w3.org/2000/svg">
+      <title id="map-title">Explore the Mars habitat</title>
+      <desc id="map-description">Six buildings connected by paths. Tab to a building to hear its tasks, then press Enter or Space to open its dashboard. On touch screens tap a building and use the Open dashboard button.</desc>
+      <defs>
+        <linearGradient id="ground" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#c98465"/><stop offset="1" stop-color="#9d5944"/></linearGradient>
+        <linearGradient id="roof" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f3e5cc"/><stop offset="1" stop-color="#c6b59d"/></linearGradient>
+        <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#accab6" stop-opacity=".95"/><stop offset="1" stop-color="#345d52" stop-opacity=".95"/></linearGradient>
+        <linearGradient id="solar" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#668091"/><stop offset="1" stop-color="#304b62"/></linearGradient>
+        <pattern id="solar-grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#abc4cd" stroke-opacity=".45" stroke-width="1"/></pattern>
+        <pattern id="dust" width="37" height="31" patternUnits="userSpaceOnUse"><circle cx="5" cy="7" r=".8" fill="#efd1ad" opacity=".2"/><circle cx="26" cy="20" r="1" fill="#63392e" opacity=".2"/></pattern>
+        <filter id="shadow" x="-30%" y="-30%" width="180%" height="180%"><feDropShadow dx="12" dy="19" stdDeviation="5" flood-color="#462c26" flood-opacity=".3"/></filter>
+        <symbol id="hab-module" viewBox="0 0 200 170">
+          <path d="M15 88 108 40 188 83 93 133Z" fill="#704838" opacity=".2" transform="translate(8 16)"/>
+          <path d="M15 64 108 16 188 59 94 108Z" fill="url(#roof)" stroke="#b9a98d" stroke-width="1.3"/>
+          <path d="M15 64 94 108 94 153 15 108Z" fill="#d0bda2" stroke="#b8a38a" stroke-width="1"/>
+          <path d="M94 108 188 59 188 104 94 153Z" fill="#a28f7a" stroke="#8e7a68" stroke-width="1"/>
+          <path d="M26 60 108 28 174 60 94 99Z" fill="#f0dfc2"/>
+          <path d="M49 76 133 35M77 91 160 48" stroke="#c5b499" stroke-width="2"/>
+          <path d="M28 84 44 93 44 107 28 98ZM54 99 70 108 70 122 54 113Z" fill="#405b65" stroke="#efddbd" stroke-width="2"/>
+          <path d="M111 111 127 103 127 119 111 127ZM139 96 155 88 155 104 139 112Z" fill="#3b545a" stroke="#c2b299" stroke-width="2"/>
+          <path d="M166 85 180 78 180 107 166 114Z" fill="#5b6058"/>
+          <path d="M18 107 94 150 187 102" stroke="#dac8a8" stroke-width="5" fill="none"/>
+        </symbol>
+        <symbol id="rock" viewBox="0 0 20 14"><path d="M1 9 7 2 14 3 19 10 10 14Z" fill="#9c5e49"/><path d="m1 9 9-3 9 4-9 4Z" fill="#874d3b"/></symbol>
+      </defs>
+      <!-- An original vector illustration. Every building below is a focusable control. -->
+      <path d="m83 295 466-237 489 236-464 249Z" fill="#704b3c" transform="translate(0 14)"/>
+      <path d="m83 279 466-237 489 236-464 249Z" fill="url(#ground)"/>
+      <path d="m83 279 466-237 489 236-464 249Z" fill="url(#dust)"/>
+      <path d="m83 279 491 248v16L83 295Z" fill="#8e5542"/><path d="m574 527 464-249v16L574 543Z" fill="#694438"/>
+      <g fill="none" stroke="#dfaa85" opacity=".22" stroke-width="2">
+        <path d="M140 278q75-64 147-55M172 299q65-51 112-45M745 135q70 15 107 55M742 151q55 14 93 49M675 457q60-7 104-43M686 470q69-11 110-45M360 427q58 40 99 36"/>
+      </g>
+      <g fill="#975a45" opacity=".65"><ellipse cx="177" cy="285" rx="23" ry="12"/><ellipse cx="917" cy="296" rx="22" ry="11"/><ellipse cx="583" cy="479" rx="16" ry="8"/></g>
+      <g fill="none" stroke-linejoin="round">
+        <path d="m345 210 212 110 215-110M557 320 350 423M557 320l77 96M557 320l257 108M557 320V189" stroke="#8f6551" stroke-width="24"/>
+        <path d="m345 210 212 110 215-110M557 320 350 423M557 320l77 96M557 320l257 108M557 320V189" stroke="#d0ae89" stroke-width="17"/>
+        <path d="m345 210 212 110 215-110M557 320 350 423M557 320l77 96M557 320l257 108M557 320V189" stroke="#efcda8" stroke-width="1.5" stroke-dasharray="5 8" opacity=".65"/>
+      </g>
+      <!-- Uninhabited utility details -->
+      <g transform="translate(186 340) rotate(-27) skewX(25)" stroke="#243e4b" stroke-width="3"><path d="M0 0H94V47H0Z" fill="url(#solar)"/><path d="M0 0H94V47H0Z" fill="url(#solar-grid)" stroke="none"/><path d="M0 56H94V103H0Z" fill="url(#solar)"/><path d="M0 56H94V103H0Z" fill="url(#solar-grid)" stroke="none"/></g>
+      <g transform="translate(894 230)"><ellipse cy="24" rx="25" ry="10" fill="#744a3b" opacity=".4"/><path d="M-3 21 0-39 4 21" fill="#b9b2a1"/><path d="M0-28-25-47M0-28l20-29" stroke="#e2d6bb" stroke-width="3"/><path d="M-27-49q14 33 44-8" fill="#cdbba0" stroke="#ebdfc4" stroke-width="2"/><circle cx="0" cy="-44" r="3" fill="#e9b396"/></g>
+      <g opacity=".85"><use href="#rock" x="140" y="290" width="17" height="13"/><use href="#rock" x="810" y="165" width="22" height="16"/><use href="#rock" x="435" y="418" width="16" height="12"/><use href="#rock" x="493" y="469" width="28" height="18"/><use href="#rock" x="926" y="330" width="18" height="13"/><use href="#rock" x="390" y="100" width="15" height="10"/><use href="#rock" x="675" y="125" width="19" height="15"/></g>
+
+      <g class="building" data-area="exercise" tabindex="0" role="button" aria-label="Exercise area: review activity duration and exercise heart rate. Open Movement dashboard.">
+        <path class="halo" d="m446 163 115-62 122 64-115 70Z"/>
+        <g filter="url(#shadow)"><use href="#hab-module" x="469" y="75" width="192" height="164"/><path d="m544 124 26-13 22 12-26 14Z" fill="#a9684e"/><path d="m551 123 15 8m0-15 15 8" stroke="#f3dbc0" stroke-width="3"/></g>
+        <g class="map-label" transform="translate(571 60)"><rect x="-81" y="-20" width="162" height="30" rx="5"/><text text-anchor="middle" y="0"><tspan class="number">02</tspan> EXERCISE AREA</text></g>
+      </g>
+      <g class="building" data-area="sleep" tabindex="0" role="button" aria-label="Sleeping quarters: review overnight heart rate, HRV and sleep duration. Open Sleep dashboard.">
+        <path class="halo" d="m221 223 116-61 125 65-121 69Z"/>
+        <g filter="url(#shadow)"><use href="#hab-module" x="241" y="131" width="201" height="171"/><path d="m320 182 26-13 22 12-26 14Z" fill="#9e887e"/><path d="m333 179q-6 13 9 12-10 5-16-2-3-6 7-10" fill="#f3dbc0"/></g>
+        <g class="map-label" transform="translate(257 144)"><rect x="-90" y="-20" width="180" height="30" rx="5"/><text text-anchor="middle" y="0"><tspan class="number">01</tspan> SLEEPING QUARTERS</text></g>
+      </g>
+      <g class="building" data-area="medical" tabindex="0" role="button" aria-label="Medical bay: review vital signs and complete a symptom check-in. Open Vitals dashboard.">
+        <path class="halo" d="m677 249 116-62 125 65-120 68Z"/>
+        <g filter="url(#shadow)"><use href="#hab-module" x="698" y="156" width="201" height="171"/><path d="m772 208 26-13 22 12-26 14Z" fill="#b46b57"/><path d="m788 203 12 6m-3-9-6 12" stroke="#fff0d6" stroke-width="4"/></g>
+        <g class="map-label" transform="translate(819 169)"><rect x="-73" y="-20" width="146" height="30" rx="5"/><text text-anchor="middle" y="0"><tspan class="number">03</tspan> MEDICAL BAY</text></g>
+      </g>
+      <!-- Small central wayfinding marker -->
+      <g transform="translate(555 293)"><path d="M0 26V-11" stroke="#e3d2ad" stroke-width="3"/><path d="m0-14 22 5-22 8" fill="#ecd5ab"/><circle cy="27" r="4" fill="#e4ba91"/></g>
+      <g class="building" data-area="nutrition" tabindex="0" role="button" aria-label="Kitchen: log meals and fluid intake and review daily totals. Open Nutrition dashboard.">
+        <path class="halo" d="m247 411 110-60 122 65-118 66Z"/>
+        <g filter="url(#shadow)"><use href="#hab-module" x="265" y="317" width="201" height="171"/><path d="m343 369 26-13 22 12-26 14Z" fill="#b79765"/><path d="m357 365 12 6m-3-9-6 12" stroke="#f3dbc0" stroke-width="2"/></g>
+        <g class="map-label" transform="translate(321 492)"><rect x="-60" y="-20" width="120" height="30" rx="5"/><text text-anchor="middle" y="0"><tspan class="number">04</tspan> KITCHEN</text></g>
+      </g>
+      <g class="building" data-area="wellbeing" tabindex="0" role="button" aria-label="Greenhouse and common room: complete mood and stress check-ins. Open Wellbeing dashboard.">
+        <path class="halo" d="m487 441 124-67 138 71-135 71Z"/>
+        <g filter="url(#shadow)">
+          <path d="m509 437 111-58 108 58-111 63Z" fill="#b3aa8b" stroke="#d8cdab" stroke-width="2"/>
+          <path d="M521 430q0-79 67-48l112 60-84 45Z" fill="url(#glass)" stroke="#bbd0b3" stroke-width="2"/>
+          <path d="M521 430q37-37 69 36l26 21M550 414q37-37 69 36M580 399q37-37 69 36M610 395l67 36" fill="none" stroke="#d2d8b7" stroke-width="3"/>
+          <path d="m530 431 83 45 78-42M542 414l84 45M560 398l84 45" fill="none" stroke="#c1d4b9" stroke-width="1.5" opacity=".7"/>
+          <path d="m552 433 20 11m1-24 20 11m1-24 20 11m-40 27 20 11m0-24 20 11m1-24 20 11" stroke="#568969" stroke-width="8"/>
+          <path d="m615 487 86-45v13l-86 46Z" fill="#687f68"/>
+        </g>
+        <g class="map-label" transform="translate(616 528)"><rect x="-78" y="-20" width="156" height="30" rx="5"/><text text-anchor="middle" y="0"><tspan class="number">05</tspan> GREENHOUSE</text></g>
+      </g>
+      <g class="building" data-area="eva" tabindex="0" role="button" aria-label="Airlock and EVA area: review EVA duration, exposure and your pre-EVA checklist. Open EVA dashboard.">
+        <path class="halo" d="m756 409 98-53 112 59-103 59Z"/>
+        <g filter="url(#shadow)"><use href="#hab-module" x="771" y="331" width="172" height="146"/><path d="m849 421 15-8 27 14-15 9Z" fill="#e2c6a0"/><path d="m876 436 15-9 13 7-15 9Z" fill="#b99875"/><path d="m836 376 21-11 21 11-21 11Z" fill="#b57556"/><circle cx="856" cy="376" r="5" fill="none" stroke="#f3dbc0" stroke-width="2"/></g>
+        <g class="map-label" transform="translate(872 484)"><rect x="-79" y="-20" width="158" height="30" rx="5"/><text text-anchor="middle" y="0"><tspan class="number">06</tspan> AIRLOCK / EVA</text></g>
+      </g>
+      <g transform="translate(980 475)" fill="#d5bd9e" font-family="sans-serif" font-size="10"><path d="M0 25V-12m0 0-4 8m4-8 4 8M-11 25h22" stroke="#d5bd9e" stroke-width="1.5"/><text x="0" y="-21" text-anchor="middle">N</text></g>
+      <text x="60" y="554" fill="#b9a08c" font-size="10" letter-spacing="2" font-family="sans-serif">SCHEMATIC · NOT TO SCALE</text>
+    </svg>
+  </div>
+  <nav id="mobile-areas" class="mobile-areas" aria-label="Choose a habitat building"></nav>
+  <section class="preview" aria-live="polite" aria-atomic="true">
+    <span class="preview-number" id="preview-number">⌖</span>
+    <div class="preview-content"><h2 id="preview-name">Your habitat, at a glance.</h2><p id="preview-tasks">Choose a building to explore its daily health tasks.</p></div>
+    <button id="open-dashboard" type="button" disabled>Open dashboard <span aria-hidden="true">↗</span></button>
+  </section>
+</main>
+<script src="map.js"></script>
+</body>
+</html>

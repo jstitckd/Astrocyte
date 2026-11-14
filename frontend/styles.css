@@ -1,0 +1,304 @@
+/* Person 1: keep styling here;
+Python views supply semantic content. */
+:root {
+  --sand: #edb18c;
+  --sage: #b7c7a6;
+  --muted: #9caeaa;
+  --line: #303c40
+}
+.stApp {
+  background: #111619
+}
+.block-container {
+  max-width: 1450px;
+  padding: 4.6rem 3.2rem 2rem
+}
+header[data-testid="stHeader"] {
+  background: rgba(17,22,25,.85)
+}
+section[data-testid="stSidebar"] {
+  background: #182024;
+  border-right: 1px solid #303c40;
+  min-width: 260px;
+  max-width: 285px
+}
+section[data-testid="stSidebar"]>div {
+  padding-top: 1.7rem
+}
+.wordmark {
+  font-size: 29px;
+  letter-spacing: -1.3px;
+  font-weight: 650;
+  color: #edece1;
+  white-space: nowrap
+}
+.wordmark>span:first-child {
+  font-size: 31px;
+  font-weight: 400;
+  display: inline-block;
+  color: #dfad8b;
+  vertical-align: middle;
+  margin-right: 9px
+}
+.brand-dot {
+  color: #dfad8b
+}
+.brand-caption {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #9badab;
+  margin: 3px 0 28px 42px
+}
+.sidebar-heading {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #8ca09c;
+  margin: 24px 0 12px
+}
+section[data-testid="stSidebar"] .stButton button {
+  justify-content: flex-start;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #b5c2bd;
+  padding: .55rem .8rem;
+  font-size: 12px;
+  min-height: 38px;
+  transition: background .15s
+}
+section[data-testid="stSidebar"] .stButton button[kind="primary"] {
+  background: #303e3c;
+  color: #e7d9bc;
+  border-left: 2px solid #dcb190
+}
+section[data-testid="stSidebar"] .stButton button:hover {
+  background: #263431;
+  color: #f4eedc
+}
+section[data-testid="stSidebar"] label p {
+  font-size: 11px;
+  color: #b6c4be
+}
+section[data-testid="stSidebar"] .stCaption p {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #849894
+}
+.topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border-bottom: 1px solid var(--line);
+  padding: 0 0 17px;
+  margin-bottom: 26px;
+  color: #96aaa4;
+  font-size: 10px;
+  letter-spacing: 1.7px
+}
+.topline strong {
+  color: #d6ddcd;
+  font-weight: 500
+}
+.source-pill {
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  padding: 6px 10px;
+  border: 1px solid #536457;
+  border-radius: 4px;
+  color: #bdc9af;
+  white-space: nowrap
+}
+.source-pill.imported {
+  border-color: #71604e;
+  color: #eac5a2
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 2.7px;
+  text-transform: uppercase;
+  color: #c6a587;
+  margin: 4px 0 12px
+}
+h1 {
+  font-size: clamp(30px,3.2vw,48px)!important;
+  font-weight: 450!important;
+  line-height: 1.17!important;
+  letter-spacing: -1.8px!important;
+  color: #f0eee1;
+  padding-top: 0!important
+}
+h2 {
+  font-size: 24px!important;
+  font-weight: 450!important;
+  letter-spacing: -.6px!important
+}
+h3 {
+  font-size: 18px!important;
+  font-weight: 450!important;
+  letter-spacing: -.25px!important
+}
+.subtitle {
+  color: #a6b7b0;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 3px 0 22px;
+  max-width: 730px
+}
+.mission-line {
+  display: flex;
+  gap: 24px;
+  font-size: 10px;
+  letter-spacing: .4px;
+  color: #91a69d;
+  margin: 6px 0 23px;
+  flex-wrap: wrap
+}
+.mission-line b {
+  color: #cbd4c1;
+  font-weight: 500
+}
+div[data-testid="stMetric"] {
+  padding: 18px;
+  border: 1px solid #34413f;
+  border-radius: 8px;
+  background: #1a2326
+}
+div[data-testid="stMetricLabel"] p {
+  font-size: 11px;
+  color: #b4c1b8
+}
+div[data-testid="stMetricValue"] {
+  font-size: 29px;
+  font-weight: 450;
+  color: #f0e3cd
+}
+div[data-testid="stMetricDelta"] {
+  font-size: 11px;
+  color: #c9b597
+}
+.stCaption p {
+  font-size: 11px;
+  color: #91a69f;
+  line-height: 1.6
+}
+.stButton button {
+  border-radius: 5px
+}
+.stForm {
+  border-color: #34413f!important;
+  background: #172023;
+  border-radius: 8px
+}
+.stProgress>div>div {
+  background: #303c3c
+}
+.stProgress>div>div>div>div {
+  background: #b8c5a5
+}
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 26px 0 12px;
+  padding-top: 4px
+}
+.section-title h2 {
+  margin: 0;
+  padding: 0;
+  font-size: 20px!important
+}
+.section-title>span {
+  font-size: 10px;
+  color: #8fa59d
+}
+.note-card {
+  background: #202a2b;
+  border: 1px solid #3b4841;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 138px
+}
+.note-card .kicker {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  color: #c9b393
+}
+.note-card h3 {
+  font-size: 17px!important;
+  margin: 9px 0;
+  color: #e2e3d3
+}
+.note-card p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #acbcb0;
+  margin: 0
+}
+.footer-line {
+  border-top: 1px solid #303c40;
+  margin-top: 28px;
+  padding-top: 15px;
+  font-size: 10px;
+  color: #7f9790;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap
+}
+div[data-testid="stAlert"] {
+  font-size: 12px
+}
+.stCheckbox p {
+  font-size: 13px;
+  line-height: 1.6
+}
+hr {
+  border-color: #303c40!important
+}
+@media(max-width:900px) {
+  .block-container {
+    padding: 4.4rem 1.3rem 1.5rem
+  }
+  h1 {
+    font-size: 34px!important
+  }
+  .topline {
+    font-size: 9px;
+    letter-spacing: 1px
+  }
+}
+@media(max-width:600px) {
+  .topline {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px
+  }
+  .block-container {
+    padding: 4.2rem 1rem 1rem
+  }
+  .mission-line {
+    gap: 12px
+  }
+  .subtitle {
+    font-size: 13px
+  }
+  div[data-testid="stMetric"] {
+    padding: 12px
+  }
+  .section-title {
+    align-items: flex-start;
+    gap: 12px
+  }
+  .section-title>span {
+    max-width: 140px;
+    text-align: right
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  * {
+    transition: none!important;
+    animation: none!important;
+    scroll-behavior: auto!important
+  }
+}

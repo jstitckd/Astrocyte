@@ -1,0 +1,227 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color: #e9e9df;
+  background: transparent
+}
+.mobile-areas {
+  display: none
+}
+@media(max-width:640px) {
+  .mobile-areas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    padding: 0 16px 16px
+  }
+  .mobile-areas button {
+    font-size: 10px;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.5;
+    min-height: 44px;
+    background: #25312f;
+    border: 1px solid #45534b;
+    color: #c6d0bf;
+    padding: 7px 10px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation
+  }
+  .mobile-areas button[aria-pressed="true"],.mobile-areas button:hover:not(:disabled) {
+    border-color: #dcb694;
+    background: #3b4235;
+    color: #f0dfc7
+  }
+}
+* {
+  box-sizing: border-box
+}
+body {
+  margin: 0
+}
+.map-shell {
+  border: 1px solid #354044;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1c2427
+}
+.map-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 19px 24px 0;
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  color: #bbc5bf
+}
+.map-heading i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #a7ba9b;
+  border-radius: 50%;
+  margin-right: 8px
+}
+.map-heading b {
+  color: #6b7b7c;
+  margin: 0 9px;
+  font-weight: 400
+}
+.map-hint {
+  color: #92a29f;
+  font-size: 11px;
+  letter-spacing: 0
+}
+.drawing {
+  background: radial-gradient(ellipse at 50% 40%,#2d3030,transparent 65%);
+  padding: 0 12px
+}
+svg {
+  display: block;
+  width: 100%;
+  max-height: 580px
+}
+.building {
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent
+}
+.halo {
+  fill: #f9dbac;
+  fill-opacity: 0;
+  stroke: #fbd6a2;
+  stroke-width: 2;
+  stroke-opacity: 0;
+  transition: fill-opacity .16s,stroke-opacity .16s
+}
+.building:hover .halo,.building:focus .halo,.building.selected .halo {
+  fill-opacity: .14;
+  stroke-opacity: .95
+}
+.building:focus-visible .halo {
+  stroke-width: 4;
+  stroke-dasharray: 6 4
+}
+.map-label rect {
+  fill: #27302f;
+  fill-opacity: .93;
+  stroke: #6b7163;
+  stroke-width: .7
+}
+.map-label text {
+  fill: #f0e6d2;
+  font-family: Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px
+}
+.map-label .number {
+  fill: #d5a986;
+  letter-spacing: 0
+}
+.building:hover .map-label rect,.building:focus .map-label rect,.building.selected .map-label rect {
+  stroke: #edc197;
+  fill: #39423b
+}
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  min-height: 103px;
+  padding: 20px 24px;
+  border-top: 1px solid #354044;
+  background: #20292c
+}
+.preview-number {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #68766b;
+  color: #e8bf96;
+  border-radius: 50%;
+  font-size: 14px
+}
+.preview-content {
+  flex: 1
+}
+h2 {
+  font-weight: 500;
+  font-size: 16px;
+  margin: 0 0 7px
+}
+p {
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0;
+  color: #b0bbb5;
+  max-width: 650px
+}
+button {
+  border: 1px solid #8a9b88;
+  border-radius: 5px;
+  background: #c1ceb3;
+  color: #1c2823;
+  padding: 11px 17px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap
+}
+button span {
+  margin-left: 14px
+}
+button:disabled {
+  opacity: .45;
+  cursor: default
+}
+button:hover:not(:disabled) {
+  background: #d6e1c9
+}
+button:focus-visible {
+  outline: 3px solid #f3c49c;
+  outline-offset: 4px
+}
+@media(max-width:640px) {
+  .map-heading {
+    padding: 16px 16px 0;
+    flex-direction: column;
+    gap: 8px
+  }
+  .drawing {
+    padding: 0
+  }
+  .preview {
+    padding: 16px;
+    gap: 12px;
+    flex-wrap: wrap
+  }
+  .preview-number {
+    width: 34px;
+    height: 34px
+  }
+  .preview-content {
+    min-width: 210px
+  }
+  h2 {
+    font-size: 14px
+  }
+  p {
+    font-size: 11px
+  }
+  .preview button {
+    margin-left: 46px
+  }
+  .map-label text {
+    font-size: 11px
+  }
+  .map-hint {
+    font-size: 10px
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  * {
+    transition: none!important
+  }
+}
