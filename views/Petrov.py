@@ -1,12 +1,13 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 
+
 def render_astronaut_header(
     name: str,
     country_code: str,
+    gender: str,
     age: int,
     height_cm: int,
     weight_kg: float,
@@ -28,13 +29,15 @@ def render_astronaut_header(
         <!-- 1. Name, Flag & Demographics -->
         <div>
             <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #888888; margin-bottom: 4px;">
-                CREW TELEMETRY // ACTIVE OPERATOR
+                Commander
             </div>
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
                 <span style="font-size: 26px; font-weight: 800; line-height: 1.1; color: #fafafa;">{name}</span>
                 <img src="{flag_url}" width="28" style="border-radius: 2px; border: 1px solid #333;" alt="{country_code}">
             </div>
             <div style="display: flex; align-items: center; gap: 14px; font-size: 13px; color: #b0b0b0; font-weight: 500;">
+                <span><strong style="color: #888888; font-size: 11px;">SEX:</strong> {gender}</span>
+                <span style="color: #444444;">|</span>
                 <span><strong style="color: #888888; font-size: 11px;">AGE:</strong> {age} yrs</span>
                 <span style="color: #444444;">|</span>
                 <span><strong style="color: #888888; font-size: 11px;">HEIGHT:</strong> {height_cm} cm</span>
@@ -71,7 +74,8 @@ def render_astronaut_header(
     with st.container(border=True):
         st.html(header_html)
 
-def graphs ():
+
+def graphs():
     # ---------------------------------------------------------------------------
     # PAGE CONFIG & GLOBAL STYLES
     # ---------------------------------------------------------------------------
@@ -159,6 +163,7 @@ def graphs ():
         padding: 20px !important;
         border: none !important;
         box-shadow: none !important;
+        overflow: visible !important;
     }
     [class*="st-key-tile"], [class*="st-key-hero"] {
         height: 100%;
@@ -166,6 +171,7 @@ def graphs ():
     [class*="st-key-tile"] > div, [class*="st-key-hero"] > div,
     div[data-testid="stVerticalBlockBorderWrapper"] > div {
         gap: 0 !important;
+        overflow: visible !important;
     }
     /* Prevent nested wrappers from double-padding */
     div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stVerticalBlockBorderWrapper"] {
@@ -179,12 +185,78 @@ def graphs ():
         align-items: center;
         gap: 10px;
         margin-bottom: 8px;
+        position: relative;
+        z-index: 20;
     }
     .tile-label {
         font-size: 14px;
         font-weight: 500;
         color: var(--label-muted);
     }
+
+    /* Info icon & hover popup */
+    .info-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        cursor: help;
+    }
+    .info-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1px solid #454E56;
+        color: #8A959D;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1;
+        transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .info-wrap:hover .info-icon {
+        border-color: #6FD3FF;
+        color: #F2F4F5;
+    }
+    .info-popup {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 24px;
+        width: 245px;
+        background: #0C0E10;
+        border: 1px solid #2A3138;
+        border-radius: 12px;
+        padding: 10px 12px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.72);
+        z-index: 9999;
+        pointer-events: none;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        transform: translateY(-4px);
+    }
+    .info-wrap:hover .info-popup {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .info-popup-title {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #6FD3FF;
+        margin-bottom: 3px;
+    }
+    .info-popup-text {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.4;
+        color: #D5DBDF;
+        white-space: normal;
+    }
+
     .status-pill {
         display: inline-flex;
         align-items: center;
@@ -337,21 +409,17 @@ def graphs ():
         "danger": ("#FF5A4D", "rgba(255, 90, 77, 0.14)"),
     }
 
-
     def hex_to_rgba(hex_color: str, alpha: float) -> str:
         h = hex_color.lstrip("#")
         r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
         return f"rgba({r}, {g}, {b}, {alpha})"
 
-
     def html(markup: str) -> str:
         """Flatten indented HTML so Markdown never mistakes it for a code block."""
         return " ".join(line.strip() for line in markup.strip().splitlines())
 
-
     def pick_ticks(n: int, count: int = 5) -> list:
         return sorted(set(int(round(v)) for v in np.linspace(0, n - 1, count)))
-
 
     @st.cache_data
     def load_data():
@@ -359,7 +427,6 @@ def graphs ():
         df_30d = pd.read_csv("data/petrov_30days.csv")
         df_test = pd.read_csv("data/petrov_test.csv")
         return df_day, df_30d, df_test
-
 
     # ---------------------------------------------------------------------------
     # DATA-DRIVEN HEALTH & RECOVERY INDEX (no hardcoded clinical constants)
@@ -434,14 +501,12 @@ def graphs ():
             "clock": str(latest_day["time_station_clock"])[:5],
         }
 
-
     def level_for_score(score: float) -> str:
         if score >= 75:
             return "safe"
         if score >= 55:
             return "caution"
         return "danger"
-
 
     # ---------------------------------------------------------------------------
     # HERO RING
@@ -510,7 +575,6 @@ def graphs ():
                 unsafe_allow_html=True,
             )
 
-
     # ---------------------------------------------------------------------------
     # SPARKLINE BUILDER
     # ---------------------------------------------------------------------------
@@ -521,7 +585,6 @@ def graphs ():
     ):
         fig = go.Figure()
 
-        # Vertical range (computed first so the fill can anchor to the chart floor)
         valid_y = [float(v) for v in y_vals if pd.notna(v)]
         if forecast_y is not None:
             valid_y += [float(v) for v in forecast_y if pd.notna(v)]
@@ -532,20 +595,16 @@ def graphs ():
         y_floor = y_min - span * 0.34
         y_ceil = y_max + span * 0.28
 
-        # Night bands
         if night_bands:
             for start_x, end_x in night_bands:
                 fig.add_vrect(x0=start_x, x1=end_x, fillcolor="rgba(255, 255, 255, 0.035)", layer="below", line_width=0)
 
-        # Baseline corridor
         if baseline_band is not None:
             b_low, b_high = baseline_band
             fig.add_hrect(y0=b_low, y1=b_high, fillcolor=hex_to_rgba(accent_hex, 0.09), layer="below", line_width=0)
             for boundary in (b_low, b_high):
                 fig.add_hline(y=boundary, line=dict(color=hex_to_rgba(accent_hex, 0.28), width=1, dash="dot"), layer="below")
 
-        # Invisible floor trace: the gradient fill runs from the line down to the chart floor,
-        # and breaks wherever the main series has gaps.
         fig.add_trace(
             go.Scatter(
                 x=x_vals, y=[y_floor] * len(x_vals), mode="lines",
@@ -567,7 +626,6 @@ def graphs ():
             )
         )
 
-        # Forecast
         if forecast_x is not None and forecast_y is not None:
             fig.add_trace(
                 go.Scatter(
@@ -578,7 +636,6 @@ def graphs ():
                 )
             )
 
-        # "Now" marker
         if now_x is not None and now_y is not None:
             fig.add_trace(
                 go.Scatter(
@@ -615,19 +672,35 @@ def graphs ():
         )
         return fig
 
-
     # ---------------------------------------------------------------------------
     # TILE
     # ---------------------------------------------------------------------------
-    def render_tile(label, status_text, status_level, value_str, unit, fig, tip, subrows=None):
+    def render_tile(label, status_text, status_level, value_str, unit, fig, tip, subrows=None, measures="", why=""):
         solid_col, bg_col = STATUS_STYLES[status_level]
         key = "tile_" + "".join(c if c.isalnum() else "_" for c in label.lower())
+
+        info_html = ""
+        if measures or why:
+            info_html = f"""
+            <span class="info-wrap">
+                <span class="info-icon">i</span>
+                <div class="info-popup">
+                    <div class="info-popup-title">What it measures</div>
+                    <div class="info-popup-text" style="margin-bottom: 6px;">{measures}</div>
+                    <div class="info-popup-title">Why it matters</div>
+                    <div class="info-popup-text">{why}</div>
+                </div>
+            </span>
+            """
 
         with st.container(border=True, key=key):
             st.markdown(
                 html(f"""
                 <div class="tile-top">
-                    <span class="tile-label">{label}</span>
+                    <div style="display: inline-flex; align-items: center; gap: 7px;">
+                        <span class="tile-label">{label}</span>
+                        {info_html}
+                    </div>
                     <span class="status-pill" style="background:{bg_col}; color:{solid_col};">
                         <span class="status-dot" style="background:{solid_col};"></span>{status_text}
                     </span>
@@ -650,7 +723,6 @@ def graphs ():
                 subrows_html = f'<div class="tile-divider">{items}</div>'
 
             st.markdown(html(f'<div class="tile-tip">{tip}</div>{subrows_html}'), unsafe_allow_html=True)
-
 
     # ---------------------------------------------------------------------------
     # MAIN
@@ -692,10 +764,8 @@ def graphs ():
     hr_obs_max = float(df_day["heart_rate_bpm"].max())
     hr_range = max(hr_obs_max - hr_obs_min, 1.0)
 
-
     def to_strain(hr):
         return (hr - hr_obs_min) / hr_range * 100.0
-
 
     col1, col2, col3 = st.columns(3)
 
@@ -714,6 +784,8 @@ def graphs ():
             "Heart rate", hr_text, hr_level, f"{hr_now}", "bpm", fig_hr,
             f"Currently {activity}; evening settles toward about {sleep_hr_med} bpm overnight.",
             subrows=[("Resting low", f"{int(hr_obs_min)} bpm"), ("Session peak", f"{int(hr_obs_max)} bpm")],
+            measures="Continuous beats per minute across sleep, station tasks, and EVA blocks.",
+            why="Flags acute physical exertion, dehydration, or cardiovascular deconditioning in reduced gravity.",
         )
 
     with col2:
@@ -730,6 +802,8 @@ def graphs ():
             "Oxygen saturation", spo2_text, spo2_level, f"{spo2_now}", "%", fig_spo2,
             f"Lowest reading today was {spo2_min}%, across sleep and work blocks.",
             subrows=[("24h average", f"{df_day['oxygen_saturation_pct'].mean():.1f}%"), ("Minimum", f"{spo2_min}%")],
+            measures="Percentage of oxygen-saturated hemoglobin in arterial blood (SpO₂).",
+            why="Provides early warning of cabin air-scrubber faults, suit pressure drops, or respiratory hypoxia.",
         )
 
     with col3:
@@ -749,6 +823,8 @@ def graphs ():
             "Cardiovascular load", st_text, st_level, f"{now_strain}", "%", fig_strain,
             "Share of today's heart-rate range; projected to ease into the evening.",
             subrows=[("Current block", activity.capitalize()), ("Samples logged", f"{len(df_day)} pts")],
+            measures="Normalized cardiac effort relative to the astronaut's 24-hour resting-to-peak heart-rate range.",
+            why="Tracks cumulative metabolic workload so flight surgeons can prevent overexertion before EVA shifts.",
         )
 
     # --- Section 2: 30-day recovery & readiness --------------------------------
@@ -783,6 +859,8 @@ def graphs ():
         render_tile(
             "Overnight HRV", str(latest_30["hrv_status"]).capitalize(), hrv_level, f"{int(hrv_now)}", "ms", fig_hrv, hrv_tip,
             subrows=[("7-day average", f"{latest_30['hrv_7day_avg_ms']:.1f} ms"), ("Baseline range", f"{base_low}–{base_high} ms")],
+            measures="Millisecond variation between consecutive heartbeats during overnight sleep compared to baseline.",
+            why="Reflects autonomic nervous system balance, highlighting accumulated stress, illness, or under-recovery.",
         )
 
     with c2:
@@ -802,6 +880,8 @@ def graphs ():
         render_tile(
             "Sleep score", sleep_text, sleep_level, f"{sleep_val}", "pts", fig_sleep, sleep_tip,
             subrows=[("30-day average", f"{sleep_avg:.0f} pts"), ("30-day peak", f"{int(df_30d['sleep_score_1_100'].max())} pts")],
+            measures="Composite 1–100 score of sleep duration, deep/REM architecture, and nighttime awakenings.",
+            why="Circadian disruption on Mars/orbit impairs executive judgment, mood stability, and physical tissue repair.",
         )
 
     with c3:
@@ -817,6 +897,8 @@ def graphs ():
             "VO₂ max estimate", vo2_text, vo2_level, f"{vo2_val:.1f}", "ml/kg/min", fig_vo2,
             f"Aerobic capacity changed {vo2_change:+.1f} ml/kg/min over the past 30 days.",
             subrows=[("30-day change", f"{vo2_change:+.1f} ml/kg/min"), ("30-day low", f"{df_30d['vo2_max_estimate_ml_kg_min'].min():.1f} ml/kg/min")],
+            measures="Maximum rate of oxygen consumption per kilogram of body mass during aerobic exercise.",
+            why="Verifies that daily treadmill and cycle countermeasures are preventing aerobic fitness loss.",
         )
 
     # --- Section 3: monthly health tests ---------------------------------------
@@ -850,6 +932,8 @@ def graphs ():
         render_tile(
             "Dominant handgrip", grip_text, grip_level, f"{grip_val:.1f}", "kgf", fig_grip, grip_tip,
             subrows=[("Mission delta", f"{grip_delta:+.1f} kgf"), ("Working memory", f"{int(latest_test['working_memory_2back_accuracy_pct'])}% (2-back)")],
+            measures="Peak isometric squeeze force (kgf) across three dynamometer trials.",
+            why="Tracks neuromuscular strength and forearm endurance critical for pressurized EVA glove operations.",
         )
 
     with t2:
@@ -869,6 +953,8 @@ def graphs ():
         render_tile(
             "Psychomotor vigilance", pvt_text, pvt_level, f"{pvt_val}", "ms", fig_pvt, pvt_tip,
             subrows=[(f"{n_tests}-month best", f"{int(p.min())} ms"), (f"{n_tests}-month average", f"{p.mean():.0f} ms")],
+            measures="Median visual-stimulus reaction speed (ms) during a sustained attention task.",
+            why="Detects subtle cognitive fatigue, sleep debt, or CO₂-induced alertness dips before high-risk maneuvers.",
         )
 
     with t3:
@@ -890,20 +976,12 @@ def graphs ():
         render_tile(
             "Total hip bone density", dxa_text, dxa_level, f"{dxa_val:.3f}", "g/cm²", fig_dxa, dxa_tip,
             subrows=[("Net change", f"{dxa_delta:+.3f} g/cm²"), (f"{n_tests}-month mean", f"{d.mean():.3f} g/cm²")],
+            measures="Dual-energy X-ray absorptiometry (DXA) bone mineral density (g/cm²) at the proximal femur.",
+            why="Monitors skeletal demineralization caused by reduced mechanical loading on Mars and in transit.",
         )
+
     return round(health_summary["overall"] / 10.0, 1)
-# --- Render Alex's Header ---
-# def render():
-#     render_astronaut_header(
-#         name="Petrov Volkov",
-#         country_code="ru",
-#         age=98,
-#         height_cm=222,
-#         weight_kg=50.5,
-#         health_score=0.3,
-#         time_outside="02h 06m",
-#     )
-#     graphs()
+
 
 def render():
     # 1. Reserve the top spot on the page first
@@ -917,6 +995,7 @@ def render():
         render_astronaut_header(
             name="Petrov Volkov",
             country_code="ru",
+            gender="Male",
             age=48,
             height_cm=182,
             weight_kg=78.5,
