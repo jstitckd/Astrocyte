@@ -1,6 +1,7 @@
 """Shared branding and navigation. Page content belongs in views/."""
 
 import base64
+import re
 from pathlib import Path
 
 import streamlit as st
@@ -51,24 +52,130 @@ def go(page):
     st.session_state.page = page
 
 
+def _health_score(astronaut):
+    """Read the score currently stored in astronaut.icon."""
+    match = re.search(r"-?\d+(?:\.\d+)?", str(astronaut.icon))
+    if match is None:
+        return None
+
+    return max(0.0, min(100.0, float(match.group())))
+
+
+def _score_colour(score):
+    """Smoothly interpolate red -> yellow -> green."""
+    stops = (
+        (0, (239, 101, 101)),
+        (50, (232, 200, 108)),
+        (100, (102, 201, 143)),
+    )
+
+    for (low, start), (high, end) in zip(stops, stops[1:]):
+        if score <= high:
+            fraction = (score - low) / (high - low)
+            channels = [
+                round(a + (b - a) * fraction)
+                for a, b in zip(start, end)
+            ]
+            return "#{:02x}{:02x}{:02x}".format(*channels)
+
+    return "#66c98f"
+
+
 def _inject_sidebar_styles():
-    # Build exact selectors for astronaut buttons using their Streamlit keys
-    astro_btn_selectors = ",\n".join(
-        f'html body section[data-testid="stSidebar"] .st-key-nav_{aid} button'
-        for aid in Astronauts
-    )
-    astro_inner_selectors = ",\n".join(
-        f'html body section[data-testid="stSidebar"] .st-key-nav_{aid} button > div,\n'
-        f'html body section[data-testid="stSidebar"] .st-key-nav_{aid} button [data-testid="stMarkdownContainer"],\n'
-        f'html body section[data-testid="stSidebar"] .st-key-nav_{aid} button p'
-        for aid in Astronauts
-    )
+    sidebar = 'html body section[data-testid="stSidebar"]'
+    astronaut_styles = []
+
+    for astronaut_id, astronaut in Astronauts.items():
+        button = f"{sidebar} .st-key-nav_{astronaut_id} button"
+        score = _health_score(astronaut)
+        colour = _score_colour(score) if score is not None else "#8a959d"
+        angle = (score or 0) * 3.6
+
+        astronaut_styles.append(
+            f"""
+            {button} {{
+                position: relative !important;
+                width: 100% !important;
+                min-height: 3.75rem !important;
+                padding: 0.55rem 3.65rem 0.55rem 0.65rem !important;
+            }}
+
+            /* Anchor the score to the button, not its label wrapper. */
+            {button} * {{
+                position: static !important;
+                transform: none !important;
+            }}
+
+            {button} > div,
+            {button} [data-testid="stMarkdownContainer"],
+            {button} p {{
+                display: block !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+                text-align: left !important;
+                margin: 0 !important;
+            }}
+
+            /* Number in the centre of the ring. */
+            {button} p strong {{
+                position: absolute !important;
+                right: 0.55rem !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+
+                width: 2.65rem !important;
+                height: 2.65rem !important;
+                box-sizing: border-box !important;
+                border: none !important;
+                border-radius: 50% !important;
+                background: transparent !important;
+
+                margin: 0 !important;
+                padding: 0 !important;
+                float: none !important;
+
+                font-size: 0.78rem !important;
+                font-weight: 700 !important;
+                font-variant-numeric: tabular-nums;
+                line-height: 1 !important;
+                white-space: nowrap !important;
+                color: inherit !important;
+                isolation: isolate;
+            }}
+
+            /* Mask out the centre, leaving a coloured progress ring. */
+            {button} p strong::before {{
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                pointer-events: none;
+                background: conic-gradient(
+                    {colour} 0deg {angle:.2f}deg,
+                    #293137 {angle:.2f}deg 360deg
+                );
+                -webkit-mask: radial-gradient(
+                    farthest-side,
+                    transparent calc(100% - 4px),
+                    #000 calc(100% - 3.5px)
+                );
+                mask: radial-gradient(
+                    farthest-side,
+                    transparent calc(100% - 4px),
+                    #000 calc(100% - 3.5px)
+                );
+            }}
+            """
+        )
 
     st.markdown(
         f"""
         <style>
-            /* Keep a narrow sidebar footprint. */
-            html body section[data-testid="stSidebar"] {{
+            {sidebar} {{
                 width: 4.5rem !important;
                 min-width: 4.5rem !important;
                 max-width: 4.5rem !important;
@@ -79,15 +186,12 @@ def _inject_sidebar_styles():
                 z-index: 999999 !important;
             }}
 
-            /* Hide Streamlit's collapse and resize controls. */
             html body [data-testid="stSidebarCollapseButton"],
             html body [data-testid="stSidebarResizeHandle"] {{
                 display: none !important;
             }}
 
-            /* Expand over the page when hovered. */
-            html body section[data-testid="stSidebar"]
-            [data-testid="stSidebarContent"] {{
+            {sidebar} [data-testid="stSidebarContent"] {{
                 position: absolute !important;
                 top: 0;
                 left: 0;
@@ -95,19 +199,15 @@ def _inject_sidebar_styles():
                 width: 4.5rem;
                 overflow-x: hidden !important;
                 background-color: inherit;
-                transition:
-                    width 0.22s ease,
-                    box-shadow 0.22s ease;
+                transition: width 0.22s ease, box-shadow 0.22s ease;
             }}
 
-            html body section[data-testid="stSidebar"]:hover
-            [data-testid="stSidebarContent"] {{
+            {sidebar}:hover [data-testid="stSidebarContent"] {{
                 width: 17.5rem;
                 box-shadow: 8px 0 24px rgba(0, 0, 0, 0.45);
             }}
 
-            /* Branding. */
-            html body section[data-testid="stSidebar"] .wordmark {{
+            {sidebar} .wordmark {{
                 display: flex;
                 align-items: center;
                 gap: 0.65rem;
@@ -115,27 +215,22 @@ def _inject_sidebar_styles():
                 overflow: hidden;
             }}
 
-            html body section[data-testid="stSidebar"] .brand-mark {{
+            {sidebar} .brand-mark {{
                 width: 28px;
                 height: 28px;
                 flex-shrink: 0;
             }}
 
-            html body section[data-testid="stSidebar"]:not(:hover)
-            .wordmark {{
+            {sidebar}:not(:hover) .wordmark {{
                 justify-content: center;
                 gap: 0;
             }}
 
-            html body section[data-testid="stSidebar"]:not(:hover)
-            .brand-name {{
+            {sidebar}:not(:hover) .brand-name {{
                 display: none;
             }}
 
-            /* Three dots beneath the logo when compressed.
-               Reserve their space so navigation does not jump. */
-            html body section[data-testid="stSidebar"]
-            .sidebar-dots {{
+            {sidebar} .sidebar-dots {{
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -148,14 +243,11 @@ def _inject_sidebar_styles():
                 pointer-events: none;
             }}
 
-            html body section[data-testid="stSidebar"]:hover
-            .sidebar-dots {{
+            {sidebar}:hover .sidebar-dots {{
                 visibility: hidden;
             }}
 
-            /* Section heading. */
-            html body section[data-testid="stSidebar"]
-            .sidebar-section-heading {{
+            {sidebar} .sidebar-section-heading {{
                 margin: 0;
                 padding: 0 0.85rem;
                 font-size: 0.8rem;
@@ -167,23 +259,19 @@ def _inject_sidebar_styles():
                 opacity: 0.7;
             }}
 
-            html body section[data-testid="stSidebar"]:not(:hover)
-            .sidebar-section-heading {{
+            {sidebar}:not(:hover) .sidebar-section-heading {{
                 visibility: hidden;
                 opacity: 0;
                 transition: none;
             }}
 
-            html body section[data-testid="stSidebar"]:hover
-            .sidebar-section-heading {{
+            {sidebar}:hover .sidebar-section-heading {{
                 visibility: visible;
                 opacity: 0.7;
                 transition: opacity 0.1s ease 0.22s;
             }}
 
-            /* Navigation button boxes keep a consistent height. */
-            html body section[data-testid="stSidebar"]
-            [data-testid="stButton"] button {{
+            {sidebar} [data-testid="stButton"] button {{
                 height: auto !important;
                 min-height: 2.75rem !important;
                 min-width: 0 !important;
@@ -194,63 +282,38 @@ def _inject_sidebar_styles():
                 padding: 0.45rem 0.85rem !important;
             }}
 
-            /* Force ONLY internal astronaut buttons all the way to the left border. */
-            {astro_btn_selectors} {{
-                display: flex !important;
-                justify-content: flex-start !important;
-                align-items: center !important;
-                padding-left: 0.65rem !important;
-                text-align: left !important;
-            }}
-
-            {astro_inner_selectors} {{
-                display: block !important;
-                width: 100% !important;
-                text-align: left !important;
-                margin-left: 0 !important;
-                margin-right: auto !important;
-            }}
-
-            /* Prevent labels from shrinking. */
-            html body section[data-testid="stSidebar"]
-            [data-testid="stButton"] button > * {{
+            {sidebar} [data-testid="stButton"] button > * {{
                 flex-shrink: 0 !important;
             }}
 
-            html body section[data-testid="stSidebar"]
-            [data-testid="stButton"] button p {{
+            {sidebar} [data-testid="stButton"] button p {{
                 margin: 0 !important;
                 line-height: 1.25 !important;
                 white-space: nowrap !important;
                 word-spacing: normal !important;
             }}
 
-            /* Style the role subtitle rendered via Markdown emphasis on line 2 in gray. */
-            html body section[data-testid="stSidebar"]
-            [data-testid="stButton"] button p em {{
+            {sidebar} [data-testid="stButton"] button p em {{
                 font-style: normal !important;
                 font-size: 0.75rem !important;
                 color: #8a959d !important;
             }}
 
-            /* Hide all text and icons immediately when compressed. */
-            html body section[data-testid="stSidebar"]:not(:hover)
-            [data-testid="stButton"] button * {{
+            {"".join(astronaut_styles)}
+
+            {sidebar}:not(:hover) [data-testid="stButton"] button * {{
                 visibility: hidden !important;
                 opacity: 0 !important;
                 transition: none !important;
             }}
 
-            /* Reveal labels after the sidebar finishes expanding. */
-            html body section[data-testid="stSidebar"]:hover
-            [data-testid="stButton"] button * {{
+            {sidebar}:hover [data-testid="stButton"] button * {{
                 visibility: visible !important;
                 opacity: 1 !important;
                 transition: opacity 0.1s ease 0.22s !important;
             }}
 
-            html body section[data-testid="stSidebar"]:not(:hover)
-            [data-testid="stButton"] button {{
+            {sidebar}:not(:hover) [data-testid="stButton"] button {{
                 padding: 0 !important;
             }}
         </style>
@@ -276,9 +339,7 @@ def render_sidebar():
         )
 
         st.divider()
-
         _nav("home", "⌂   Base overview")
-
         st.divider()
 
         st.markdown(
@@ -289,13 +350,16 @@ def render_sidebar():
         )
 
         for astronaut_id, astronaut in Astronauts.items():
+            score = _health_score(astronaut)
+            score_label = f"{score:g}%" if score is not None else "n/a"
+
             _nav(
                 astronaut_id,
-                f"{astronaut.name}  {astronaut.icon}  \n*{astronaut.role}*",
+                f"{astronaut.name} **{score_label}**  \n"
+                f"*{astronaut.role}*",
             )
 
         st.divider()
-
         _nav("data", "↧   Data & exports")
 
 
