@@ -141,6 +141,33 @@ def _inject_sidebar_styles():
                 visibility: hidden;
             }
 
+            /* Section heading. */
+            html body section[data-testid="stSidebar"]
+            .sidebar-section-heading {
+                margin: 0;
+                padding: 0 0.85rem;
+                font-size: 0.8rem;
+                font-weight: 600;
+                line-height: 1.5rem;
+                white-space: nowrap;
+                overflow: hidden;
+                opacity: 0.7;
+            }
+
+            html body section[data-testid="stSidebar"]:not(:hover)
+            .sidebar-section-heading {
+                visibility: hidden;
+                opacity: 0;
+                transition: none;
+            }
+
+            html body section[data-testid="stSidebar"]:hover
+            .sidebar-section-heading {
+                visibility: visible;
+                opacity: 0.7;
+                transition: opacity 0.1s ease 0.22s;
+            }
+
             /* Navigation button boxes keep a consistent height. */
             html body section[data-testid="stSidebar"]
             [data-testid="stButton"] button {
@@ -213,6 +240,15 @@ def render_sidebar():
         st.divider()
 
         _nav("home", "⌂   Base overview")
+
+        st.divider()
+
+        st.markdown(
+            '<h2 class="sidebar-section-heading">'
+            'Astronaut profiles'
+            '</h2>',
+            unsafe_allow_html=True,
+        )
 
         for astronaut_id, astronaut in Astronauts.items():
             _nav(
