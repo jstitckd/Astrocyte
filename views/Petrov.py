@@ -1,3 +1,4 @@
+from pathlib import Path
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -301,7 +302,7 @@ def graphs():
         color: var(--tip-text);
         margin-top: 10px;
         line-height: 1.4;
-        min-height: 2.8em; /* two lines, keeps tile footers aligned across a row */
+        min-height: 2.8em;
     }
     .tile-divider {
         border-top: 1px solid var(--divider);
@@ -421,20 +422,31 @@ def graphs():
     def pick_ticks(n: int, count: int = 5) -> list:
         return sorted(set(int(round(v)) for v in np.linspace(0, n - 1, count)))
 
+    def resolve_csv(filename: str) -> Path:
+        data_path = Path("data") / filename
+        return data_path if data_path.exists() else Path(filename)
+
     @st.cache_data
     def load_data():
-        df_day = pd.read_csv("data/petrov.csv")
-        df_30d = pd.read_csv("data/petrov_30days.csv")
-        df_test = pd.read_csv("data/petrov_test.csv")
-        return df_day, df_30d, df_test
+        df_day = pd.read_csv(resolve_csv("petrov.csv"))
+        df_30d = pd.read_csv(resolve_csv("petrov_30days.csv"))
+        df_test = pd.read_csv(resolve_csv("petrov_test.csv"))
+        df_extra = pd.read_csv(resolve_csv("petrov_extra.csv"))
+        return df_day, df_30d, df_test, df_extra
 
     # ---------------------------------------------------------------------------
     # DATA-DRIVEN HEALTH & RECOVERY INDEX (no hardcoded clinical constants)
     # ---------------------------------------------------------------------------
-    def compute_composite_index(df_day: pd.DataFrame, df_30d: pd.DataFrame, df_test: pd.DataFrame) -> dict:
+    def compute_composite_index(
+        df_day: pd.DataFrame,
+        df_30d: pd.DataFrame,
+        df_test: pd.DataFrame,
+        df_extra: pd.DataFrame,
+    ) -> dict:
         latest_day = df_day.iloc[-1]
         latest_30 = df_30d.iloc[-1]
         latest_test = df_test.iloc[-1]
+        latest_extra = df_extra.iloc[-1]
 
         def empirical_percentile_score(val: float, series: pd.Series, higher_is_better: bool = True) -> float:
             s_min, s_max = float(series.min()), float(series.max())
@@ -471,7 +483,7 @@ def graphs():
         spo2_score = float(np.clip((spo2_now / max(spo2_max, 1.0)) * 100.0, 0.0, 100.0))
         telemetry_pillar = float(np.mean([rhr_score, spo2_score]))
 
-        # 3. Monthly tests
+        # 3. Monthly tests & strength metrics
         grip_score = empirical_percentile_score(
             float(latest_test["dominant_handgrip_best_of_3_kgf"]), df_test["dominant_handgrip_best_of_3_kgf"], True
         )
@@ -484,11 +496,36 @@ def graphs():
         dxa_score = empirical_percentile_score(
             float(latest_test["dxa_total_hip_bone_density_g_cm2"]), df_test["dxa_total_hip_bone_density_g_cm2"], True
         )
-        test_pillar = float(np.mean([grip_score, pvt_score, memory_score, dxa_score]))
+        imtp_score = empirical_percentile_score(
+            float(latest_extra["isometric_mid_thigh_pull_peak_force_best_of_3_n"]),
+            df_extra["isometric_mid_thigh_pull_peak_force_best_of_3_n"],
+            True,
+        )
+        leg_press_score = empirical_percentile_score(
+            float(latest_extra["seated_leg_press_1rm_kg"]),
+            df_extra["seated_leg_press_1rm_kg"],
+            True,
+        )
+        chest_score = empirical_percentile_score(
+            float(latest_extra["chest_cable_isometric_peak_force_best_of_3_n"]),
+            df_extra["chest_cable_isometric_peak_force_best_of_3_n"],
+            True,
+        )
+        row_score = empirical_percentile_score(
+            float(latest_extra["row_cable_isometric_peak_force_best_of_3_n"]),
+            df_extra["row_cable_isometric_peak_force_best_of_3_n"],
+            True,
+        )
+
+        test_pillar = float(np.mean([
+            grip_score, pvt_score, memory_score, dxa_score,
+            imtp_score, leg_press_score, chest_score, row_score,
+        ]))
 
         overall = int(round(float(np.mean([
             hrv_score, sleep_score, vo2_score, rhr_score, spo2_score,
             grip_score, pvt_score, memory_score, dxa_score,
+            imtp_score, leg_press_score, chest_score, row_score,
         ]))))
 
         return {
@@ -567,7 +604,7 @@ def graphs():
                         <div class="hero-pillars">
                             {pillar("30-day recovery", summary['recovery_pillar'], "HRV · sleep · VO₂ max")}
                             {pillar("Station telemetry", summary['telemetry_pillar'], "Resting HR · SpO₂")}
-                            {pillar("Health test readiness", summary['test_pillar'], "Grip · PVT · memory · DXA")}
+                            {pillar("Health test readiness", summary['test_pillar'], "Grip · PVT · DXA · Strength")}
                         </div>
                     </div>
                 </div>
@@ -727,9 +764,9 @@ def graphs():
     # ---------------------------------------------------------------------------
     # MAIN
     # ---------------------------------------------------------------------------
-    df_day, df_30d, df_test = [d.copy() for d in load_data()]
+    df_day, df_30d, df_test, df_extra = [d.copy() for d in load_data()]
 
-    health_summary = compute_composite_index(df_day, df_30d, df_test)
+    health_summary = compute_composite_index(df_day, df_30d, df_test, df_extra)
     render_circular_hero(health_summary)
 
     # --- Section 1: live telemetry ---------------------------------------------
@@ -978,6 +1015,93 @@ def graphs():
             subrows=[("Net change", f"{dxa_delta:+.3f} g/cm²"), (f"{n_tests}-month mean", f"{d.mean():.3f} g/cm²")],
             measures="Dual-energy X-ray absorptiometry (DXA) bone mineral density (g/cm²) at the proximal femur.",
             why="Monitors skeletal demineralization caused by reduced mechanical loading on Mars and in transit.",
+        )
+
+    # --- Section 4: musculoskeletal & strength tests (petrov_extra.csv) --------
+    st.markdown('<div class="section-title">Musculoskeletal & strength tests</div>', unsafe_allow_html=True)
+
+    df_extra["extra_idx"] = np.arange(len(df_extra))
+    df_extra["month_short"] = pd.to_datetime(df_extra["date"]).dt.strftime("%b %Y")
+    latest_extra = df_extra.iloc[-1]
+    n_extra = len(df_extra)
+    textra_vals = pick_ticks(n_extra)
+    textra_text = [pd.to_datetime(df_extra["date"].iloc[i]).strftime("%b") for i in textra_vals]
+    xe = [0, max(n_extra - 1, 1)]
+
+    def strength_status(latest_val: float, series: pd.Series, unit_label: str):
+        delta = latest_val - float(series.iloc[0])
+        if latest_val >= float(series.max()):
+            return "safe", "Peak", f"Highest {unit_label} output across your {n_extra}-month log.", delta
+        if delta >= 0:
+            return "safe", "Maintained", f"Force output is at or above your mission baseline.", delta
+        return "caution", "Below start", f"Down {abs(delta):.1f} from baseline; review resistance load.", delta
+
+    s1, s2, s3 = st.columns(3)
+
+    with s1:
+        imtp_s = df_extra["isometric_mid_thigh_pull_peak_force_best_of_3_n"]
+        imtp_val = int(latest_extra["isometric_mid_thigh_pull_peak_force_best_of_3_n"])
+        imtp_lvl, imtp_txt, imtp_tip, imtp_delta = strength_status(float(imtp_val), imtp_s, "peak pull")
+        fig_imtp = build_sparkline(
+            x_vals=df_extra["extra_idx"], y_vals=imtp_s, hover_labels=df_extra["month_short"], unit="N",
+            accent_hex=ACCENTS["orange"], tick_vals=textra_vals, tick_text=textra_text, x_range=xe,
+            now_x=int(latest_extra["extra_idx"]), now_y=imtp_val, now_label=latest_extra["month_short"],
+        )
+        render_tile(
+            "Isometric mid-thigh pull", imtp_txt, imtp_lvl, f"{imtp_val}", "N", fig_imtp, imtp_tip,
+            subrows=[("Mission delta", f"{imtp_delta:+.0f} N"), (f"{n_extra}-month mean", f"{imtp_s.mean():.0f} N")],
+            measures="Peak vertical ground-reaction force (Newtons) across three maximal mid-thigh pull trials.",
+            why="Evaluates whole-body posterior-chain power required for surface locomotion and sample recovery.",
+        )
+
+    with s2:
+        lp_s = df_extra["seated_leg_press_1rm_kg"]
+        lp_val = float(latest_extra["seated_leg_press_1rm_kg"])
+        lp_lvl, lp_txt, lp_tip, lp_delta = strength_status(lp_val, lp_s, "leg press")
+        fig_lp = build_sparkline(
+            x_vals=df_extra["extra_idx"], y_vals=lp_s, hover_labels=df_extra["month_short"], unit="kg",
+            accent_hex=ACCENTS["lime"], tick_vals=textra_vals, tick_text=textra_text, x_range=xe,
+            now_x=int(latest_extra["extra_idx"]), now_y=lp_val, now_label=latest_extra["month_short"],
+        )
+        render_tile(
+            "Seated leg press 1RM", lp_txt, lp_lvl, f"{lp_val:.1f}", "kg", fig_lp, lp_tip,
+            subrows=[("Mission delta", f"{lp_delta:+.1f} kg"), (f"{n_extra}-month peak", f"{lp_s.max():.1f} kg")],
+            measures="One-repetition maximum (1RM) lower-limb pushing load in kilograms on the resistive exercise unit.",
+            why="Preserves quadriceps and gluteal mass against anti-gravity muscle atrophy during prolonged low-G stays.",
+        )
+
+    with s3:
+        chest_s = df_extra["chest_cable_isometric_peak_force_best_of_3_n"]
+        chest_val = int(latest_extra["chest_cable_isometric_peak_force_best_of_3_n"])
+        chest_lvl, chest_txt, chest_tip, chest_delta = strength_status(float(chest_val), chest_s, "chest press")
+        fig_chest = build_sparkline(
+            x_vals=df_extra["extra_idx"], y_vals=chest_s, hover_labels=df_extra["month_short"], unit="N",
+            accent_hex=ACCENTS["ice_blue"], tick_vals=textra_vals, tick_text=textra_text, x_range=xe,
+            now_x=int(latest_extra["extra_idx"]), now_y=chest_val, now_label=latest_extra["month_short"],
+        )
+        render_tile(
+            "Chest cable isometric force", chest_txt, chest_lvl, f"{chest_val}", "N", fig_chest, chest_tip,
+            subrows=[("Mission delta", f"{chest_delta:+.0f} N"), (f"{n_extra}-month mean", f"{chest_s.mean():.0f} N")],
+            measures="Best-of-three peak horizontal pushing force (Newtons) on the cable resistance rig.",
+            why="Monitors upper-body anterior pressing strength needed for hatch operations and EVA suit donning.",
+        )
+
+    s4, _, _ = st.columns(3)
+
+    with s4:
+        row_s = df_extra["row_cable_isometric_peak_force_best_of_3_n"]
+        row_val = int(latest_extra["row_cable_isometric_peak_force_best_of_3_n"])
+        row_lvl, row_txt, row_tip, row_delta = strength_status(float(row_val), row_s, "cable row")
+        fig_row = build_sparkline(
+            x_vals=df_extra["extra_idx"], y_vals=row_s, hover_labels=df_extra["month_short"], unit="N",
+            accent_hex=ACCENTS["amber"], tick_vals=textra_vals, tick_text=textra_text, x_range=xe,
+            now_x=int(latest_extra["extra_idx"]), now_y=row_val, now_label=latest_extra["month_short"],
+        )
+        render_tile(
+            "Row cable isometric force", row_txt, row_lvl, f"{row_val}", "N", fig_row, row_tip,
+            subrows=[("Mission delta", f"{row_delta:+.0f} N"), (f"{n_extra}-month mean", f"{row_s.mean():.0f} N")],
+            measures="Best-of-three peak horizontal pulling force (Newtons) on the seated cable row rig.",
+            why="Tracks upper-back and scapular stabilizer strength to prevent shoulder injury during EVA tool handling.",
         )
 
     return round(health_summary["overall"] / 10.0, 1)
