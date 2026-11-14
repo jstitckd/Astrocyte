@@ -1,4 +1,4 @@
-# Seven-zone habitat map verification
+# Homepage environment and habitat-map verification
 
 Run from the repository root with the project environment:
 
@@ -6,7 +6,7 @@ Run from the repository root with the project environment:
 python -m unittest discover -s tests -v
 ```
 
-All **six integration tests pass** on macOS with Python 3.12 and Streamlit AppTest:
+All **16 tests pass** on macOS with Python 3.12. The six existing navigation/contract tests cover:
 
 1. New habitat destinations and older health/data routes render without exceptions; habitat pages stay title-only.
 2. The existing Alex crew sidebar route and return to Base overview still work.
@@ -14,6 +14,12 @@ All **six integration tests pass** on macOS with Python 3.12 and Streamlit AppTe
 4. Unknown, malformed and obsolete map messages leave the homepage open.
 5. Exactly seven SVG regions match the Python registry, with focusable button roles and no duplicate IDs.
 6. An unknown saved page ID returns to the homepage.
+
+## Environmental checks
+
+Ten additional tests cover actual CSV values, absent sensors, explicit cabin-demo provenance, disabling the demo, optional recorded channels, preserving gaps, physical validation, malformed files, unit conversion, recorded-chart gaps and homepage integration.
+
+Checks also verify that preferences survive a map-page round trip and that a missing weather file does not block habitat navigation.
 
 ## Real-browser verification
 
@@ -35,3 +41,19 @@ Desktop and mobile screenshots were inspected. Visual review corrected the groun
 The SVG is a concept illustration, not a verified engineering plan. The map generates no live system readings, health scores or operational statuses. The seven habitat destination pages are blank workspaces; the team's existing crew page is preserved.
 
 Windows, physical mobile devices, Safari/Firefox, screen readers and Streamlit Community Cloud were not tested for this revision. No deployment, commit or GitHub push was performed as part of this change.
+
+## Environmental browser checks
+
+Headless Chrome checks passed at desktop 1512 × 1100 and touch-enabled mobile emulation 390 × 844:
+
+- Four cards appear above the map with CSV/demo/missing source labels.
+- The temperature dial and values render correctly.
+- Unit switches update values, including mbar precision.
+- Disabling the demo removes every synthetic card value.
+- The 09:20 observation shows missing outside readings rather than stale noon values.
+- Recorded temperature and pressure charts render in their tabs.
+- Map navigation works, and returning home preserves observation, units and demo preferences.
+- The cards fit the phone viewport and mobile habitat navigation works below them.
+- No uncaught JavaScript or Streamlit exceptions occurred.
+
+Screenshots were reviewed. `docs/environment-overview-preview.png` records the four-card layout. The standalone `testing.py`, source CSV, map artwork and crew pages are unchanged by this overview integration. No deployment or GitHub push was performed.

@@ -10,19 +10,19 @@
 <main class="map-shell">
   <header class="map-header">
     <div>
-      <span class="eyebrow">A PLACE TO LIVE. A BASE TO EXPLORE.</span>
+      <span class="eyebrow">YOUR OUTPOST · TASK LOCATIONS</span>
       <h2>Mars outpost habitat map</h2>
-      <p>Seven spaces. One connected outpost. Choose a building to step inside.</p>
     </div>
-    <span class="map-instructions" id="map-instructions">Hover to explore <span aria-hidden="true">·</span> Click to open</span>
+    <div class="map-header-actions"><span id="task-count" class="task-count"></span><span class="map-instructions" id="map-instructions">Hover to explore</span></div>
   </header>
 
   <div class="map-layout">
     <div class="scene">
+      <div id="task-markers" aria-label="Assigned habitat tasks"></div>
       <!-- Original SVG scene. Each data-area matches HABITAT_AREAS in models/areas.py. -->
       <svg class="habitat-scene" viewBox="0 0 1240 790" role="group" aria-labelledby="map-title map-description" xmlns="http://www.w3.org/2000/svg">
         <title id="map-title">Explore the seven spaces of the Mars outpost</title>
-        <desc id="map-description">An isometric habitat with living quarters, life support tanks, laboratories and workshops, an exercise module, solar panels and batteries, a greenhouse and a separate lander pad. Tab to a building, then press Enter or Space to open it. The labelled space guide provides the same navigation.</desc>
+        <desc id="map-description">An isometric habitat with living quarters, life support tanks, laboratories and workshops, an exercise module, solar panels and batteries, a greenhouse and a separate lander pad. Tab to a building, then press Enter or Space to open it.</desc>
         <defs>
           <linearGradient id="terrain" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#d19675"/><stop offset=".5" stop-color="#bd7d5d"/><stop offset="1" stop-color="#9c5b45"/></linearGradient>
           <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5e8d0"/><stop offset="1" stop-color="#d8c4a3"/></linearGradient>
@@ -189,17 +189,6 @@
       <div class="scene-key"><span><i class="key-tunnel"></i>Habitat links</span><span><i class="key-service"></i>Surface access</span><span><i class="key-power"></i>Power conduit</span><span class="schematic-note">Concept schematic · Not to scale</span></div>
     </div>
 
-    <aside class="space-guide" aria-label="Habitat spaces">
-      <div class="guide-heading"><span class="eyebrow">EXPLORE THE OUTPOST</span><span id="area-count">07</span></div>
-      <nav id="space-list" aria-label="Open a habitat space"></nav>
-      <section class="detail-card" aria-live="polite" aria-atomic="true">
-        <span class="detail-category" id="selected-category">Crew habitat</span>
-        <h3 id="selected-name">Main living &amp; working quarters</h3>
-        <p id="selected-description">Choose a building to explore its role in the outpost.</p>
-        <ul id="selected-features"></ul>
-        <button id="open-page" type="button" disabled>Open space <span aria-hidden="true">↗</span></button>
-      </section>
-    </aside>
   </div>
 </main>
 <script src="map.js"></script>

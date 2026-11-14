@@ -12,9 +12,11 @@ _map = declare_component(
 )
 
 
-def render_base_map():
+def render_base_map(tasks=None):
     """Return an area ID once per activation, or None when just exploring."""
     event = _map(
+        tasks=tasks or [],
+        background=st.get_option("theme.backgroundColor") or "#111619",
         areas=[
             {
                 "id": area_id,
@@ -41,4 +43,9 @@ def render_base_map():
     if event_id == st.session_state.get("last_map_event"):
         return None
     st.session_state.last_map_event = event_id
+    task_id = event.get("task")
+    if isinstance(task_id, str) and task_id in {task["id"] for task in (tasks or [])}:
+        st.session_state.show_habitat_tasks = True
+        st.session_state.habitat_tasks_toggle = True
+        st.rerun()
     return area_id

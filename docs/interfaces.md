@@ -42,3 +42,9 @@ The sidebar uses the team's `models/astronauts.py` registry and preserves the `A
 ## Future data
 
 The habitat-map change adds no measurements, storage or device integration. Agree on any new data contracts before linking pages to services. Keep imported measurements and self-reported entries distinct.
+
+## Homepage environment interface
+
+See [environment.md](environment.md) for the environmental data contract. `services/environment.py: load_csv(bytes)` returns a normalized frame/schema, and `take_snapshot(frame, schema, sol, time, show_demo)` returns a `Snapshot` with `Reading(value, unit, source, note)` objects. Sources are `csv`, `demo` or `missing`. `converted()` changes display units without modifying raw data.
+
+`components/environment.py: render_environment_overview()` renders cards, controls and expandable profiles before the map. Agree on new recorded channels and add them to the service aliases/units with tests. Environmental values do not modify crew records.
