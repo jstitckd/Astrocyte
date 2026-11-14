@@ -23,6 +23,7 @@ section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
   align-items: center;
   gap: 12px;
   margin: 0 0 .5rem;
+  margin-top: -40px;
   min-height: 48px;
   color: #edece1;
 }

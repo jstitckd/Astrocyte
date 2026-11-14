@@ -1,10 +1,11 @@
-"""Start the blank template with python -m streamlit run app.py."""
+"""Start Astrocyte with python -m streamlit run app.py."""
 from pathlib import Path
 
 import streamlit as st
 
 from components.sidebar import render_sidebar
-from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing, Alex
+from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing, Alex, Petrov
+from views import greenhouse, launch, life_support, living, power, science
 
 ROOT = Path(__file__).resolve().parent
 
@@ -27,9 +28,20 @@ VIEWS = {
     "nutrition": nutrition.render,
     "wellbeing": wellbeing.render,
     "eva": eva.render,
+    "Petrov": Petrov.render,
     "data": data.render,
     "Alex": Alex.render
 }
+
+# Habitat-map destinations; existing crew and health routes remain available.
+VIEWS.update({
+    "living": living.render,
+    "life_support": life_support.render,
+    "science": science.render,
+    "power": power.render,
+    "greenhouse": greenhouse.render,
+    "launch": launch.render,
+})
 
 if st.session_state.get("page") not in VIEWS:
     st.session_state.page = "home"

@@ -1,34 +1,44 @@
-# Interfaces for the blank template
+# Shared page and map interfaces
 
 ## Page interface
 
-Every file in `views/` exposes `render()` with no arguments. It renders Streamlit content and returns nothing. The seven destination pages display only their titles. The homepage also embeds the editable Mars-base map.
+Views expose `render()` with no arguments. The homepage embeds the habitat map. Seven habitat destinations expose a title and a comment for the team's future content. Existing crew and older health pages remain independent.
 
-```python
-import streamlit as st
+To add a route, import its module in `app.py` and register its `render` function in `VIEWS`.
 
+## Habitat registry
 
-def render():
-    st.title("Your page title")
-    # Add your own Streamlit content here.
+`models/areas.py: HABITAT_AREAS` maps the stable IDs `living`, `life_support`, `science`, `exercise`, `power`, `greenhouse`, `launch` to `HabitatArea` instances containing:
+
+- `code`: two-digit map number.
+- `name`: full destination title and accessible label.
+- `label`: short map/guide label.
+- `description`: role shown on hover or focus.
+- `features`: tuple of facility tags.
+- `category`: short label above the description.
+
+The older `AREAS` registry is retained for legacy page titles. It is not used by the new map. Coordinate shared registry/route changes before editing.
+
+## Map bridge
+
+`components/base_map.py: render_base_map()` returns a newly selected habitat ID or `None`. It passes the registry fields and the configured accent colour into the component.
+
+```text
+Python → HTML:
+areas=[{id: "living", code: "01", name: "Main living & working quarters",
+        label: "Living & working", description: "...", features: [...], category: "..."}, ...]
+accent="#d093f6"
+
+HTML → Python:
+{area: "living", event_id: "unique-activation-id"}
 ```
 
-The integration owner imports that module in `app.py` and adds `"your_page": your_page.render` to `VIEWS`.
+Python validates the area and event ID and ignores the last processed event. `views/home.py` sets `st.session_state.page` and calls `st.rerun()`. SVG regions, `HABITAT_AREAS` and `VIEWS` must agree on IDs; the tests check this connection.
 
-## Navigation interface
+## Crew sidebar
 
-`components/sidebar.py: render_sidebar()` displays navigation. Its buttons call `go(page_id)`, which sets `st.session_state.page`. Six building names/icons are defined in `models/areas.py`; the homepage and data destinations are separate shell routes.
+The sidebar uses the team's `models/astronauts.py` registry and preserves the `Alex` route. Habitat navigation is inside the map's space guide; it does not add old building links back into the crew sidebar.
 
-Stable current IDs: `home`, `sleep`, `exercise`, `medical`, `nutrition`, `wellbeing`, `eva`, `data`. Keep these IDs aligned between the sidebar and `app.py`.
+## Future data
 
-## Map component
-
-`components/base_map.py: render_base_map()` returns a newly selected area ID or `None`. The HTML receives `areas=[{"id": "sleep", "name": "Sleeping quarters"}, ...]` and sends `{area: "sleep", event_id: "unique-activation-id"}`. Python validates both fields and ignores the last processed event.
-
-`views/home.py` sets `st.session_state.page` to the returned area ID and calls `st.rerun()`. The map IDs must match `models/areas.py` and `app.py`.
-
-## Future shared data
-
-There is no dataset, `ViewContext`, session store, provider adapter or form contract in this template. Define those together before implementing them. `models/metrics.py`, `services/`, `components/` and `data/` are the intended workspaces.
-
-Before changing arguments or IDs used by another teammate, agree on the new input/output format and update callers and tests together.
+The habitat-map change adds no measurements, storage or device integration. Agree on any new data contracts before linking pages to services. Keep imported measurements and self-reported entries distinct.

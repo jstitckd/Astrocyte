@@ -1,6 +1,6 @@
 # Astrocyte — team template
 
-A runnable Streamlit skeleton with an editable interactive Mars-base map on the homepage. All seven destination pages contain only their titles, ready for your team to build on. The sidebar, logo, dark theme and navigation remain; no demo readings, health dashboards, charts, forms, tasks or import/export workflows are active.
+A runnable Streamlit project with an original interactive seven-zone Mars outpost map. The habitat pages contain only their titles, ready for your team to build on. The purple branding, crew sidebar and existing crew pages are preserved. The map shows a concept habitat, not live systems telemetry.
 
 ## Run on your current Mac
 
@@ -54,16 +54,21 @@ The workspace also provides **Run and Debug → Run Astrocyte** (requires the Py
 
 ## Where to add your content
 
-| Page | File |
+| Habitat space | Page file |
 | --- | --- |
-| Base overview / homepage and map connection | `views/home.py` |
-| Sleeping quarters | `views/sleep.py` |
-| Exercise area | `views/exercise.py` |
-| Medical bay | `views/medical.py` |
-| Kitchen | `views/nutrition.py` |
-| Greenhouse / common room | `views/wellbeing.py` |
-| Airlock / EVA | `views/eva.py` |
+| Base overview / interactive map | `views/home.py` |
+| Main living & working quarters | `views/living.py` |
+| Environmental control & life support | `views/life_support.py` |
+| Science laboratories & maintenance workshops | `views/science.py` |
+| Exercise quarters | `views/exercise.py` |
+| Power generation & storage | `views/power.py` |
+| Greenhouse | `views/greenhouse.py` |
+| Spaceship & launch area | `views/launch.py` |
 | Data & exports | `views/data.py` |
+
+The map's labelled space guide provides the same routes as the drawing. Hover/focus shows the area's description and facilities; clicking a building or guide entry opens its page. On mobile, a guide tap previews the area, then **Open space** navigates. Direct building taps also work.
+
+Existing crew routes (including `views/Alex.py`) and older health page files remain available; the new map does not overwrite them.
 
 Every page has a small `render()` function. Add your Streamlit code below its title, inside that function. The homepage already calls `render_base_map()` and handles its selected destination. There is no common dashboard file to edit; each page can be developed independently.
 
@@ -80,7 +85,7 @@ The seven destination pages intentionally contain no sample widgets or placehold
 | --- | --- |
 | `app.py` | Loads the styling and connects page IDs to their `render()` functions. |
 | `components/sidebar.py` | Shared logo and working navigation. Put future reusable widgets under `components/`. |
-| `models/areas.py` | Building names and icons used by the sidebar and page titles. |
+| `models/areas.py` | `HABITAT_AREAS`: seven map destinations, labels, descriptions and facilities. Original `AREAS` remains for older pages. |
 | `models/metrics.py` | Empty metric dictionary for the team to define later. |
 | `frontend/styles.css` | Minimal styling for the shared shell. |
 | `frontend/map/` | Editable map drawing (`index.html`), colours (`map.css`) and interactions (`map.js`). |
@@ -96,10 +101,10 @@ Only Streamlit is used by the template. The existing pandas, Plotly and NumPy de
 
 ## Suggested four-person split
 
-- **Person 1:** `frontend/` — theme, branding and future map assets.
-- **Person 2:** `services/`, `models/metrics.py`, `data/` and `views/data.py` — define your data workflows together with the page owners.
-- **Person 3:** `views/sleep.py`, `exercise.py`, `medical.py` and `nutrition.py` — build these pages independently.
-- **Person 4:** `views/home.py`, `wellbeing.py`, `eva.py` and shared integration in `app.py`, `components/sidebar.py`, `models/areas.py`.
+- **Person 1:** `frontend/` and `views/home.py` — illustration, styling and map interactions.
+- **Person 2:** `views/life_support.py`, `power.py`, `data.py` and shared data services — coordinate contracts with page owners.
+- **Person 3:** `views/living.py`, `exercise.py` and `greenhouse.py` — crew habitat pages.
+- **Person 4:** `views/science.py`, `launch.py`, existing crew pages and shared integration in `app.py` and `models/areas.py`.
 
 Coordinate changes to shared files before editing. See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch workflow and [docs/interfaces.md](docs/interfaces.md) for the small shared contract.
 
@@ -109,11 +114,11 @@ Coordinate changes to shared files before editing. See [CONTRIBUTING.md](CONTRIB
 python -m unittest discover -s tests -v
 ```
 
-The four integration tests exercise all eight routes, keep destination pages blank, verify map navigation and reject invalid/repeated map events. Browser checks cover hover, keyboard and mobile interactions; see `docs/verification.md`.
+The six integration tests check habitat and legacy routes, the crew sidebar, blank habitat pages, map-message validation, return navigation and matching Python/SVG IDs. Real-browser checks cover all seven regions and guide links, hover descriptions, keyboard and mobile interactions; see `docs/verification.md`.
 
 ## What is deliberately absent
 
-No measurements, crew/date filters, forms, checklists, import/export implementation, storage, API connection or database is active. The **Data & exports** destination is a blank page name, not an implemented feature. Add these pieces as your team designs them.
+The habitat map adds no measurements, forms, checklists, storage, API connection or database. The team's existing crew page remains separate. The **Data & exports** destination is a blank page name, not an implemented feature. Add these pieces as your team designs them.
 
 The previous full prototype remains recoverable from Git history (commit `aef6f9d`). The previously generated `docs/code-layout-guide.html` is preserved as a historical guide to that prototype; it does not describe this simplified layout. Use the current README and architecture notes for the skeleton.
 

@@ -1,49 +1,38 @@
-# Template architecture
+# Current habitat-map architecture
 
-The app is a navigation shell with an editable interactive homepage map and seven blank destination pages. Shared branding, navigation and theme remain. There are no active health features or data services.
+`app.py` dispatches views and loads the shared purple branding. Existing crew pages and older health routes remain available. The homepage now has a seven-zone SVG habitat map, each with a title-only destination for the team to build on.
 
-## File responsibilities
-
-| Path | Purpose |
+| File | Responsibility |
 | --- | --- |
-| `app.py` | Configures Streamlit, loads CSS and calls the selected page's `render()`. |
-| `components/sidebar.py` | Sidebar logo and navigation buttons. |
-| `models/areas.py` | Names and icons for the six habitat areas. |
-| `models/metrics.py` | Empty `METRICS` dictionary for the team to define. |
-| `views/home.py` | Displays the map and navigates to its selected area. |
-| `views/sleep.py` | Blank sleeping-quarters page. |
-| `views/exercise.py` | Blank exercise page. |
-| `views/medical.py` | Blank medical-bay page. |
-| `views/nutrition.py` | Blank kitchen page. |
-| `views/wellbeing.py` | Blank greenhouse / common-room page. |
-| `views/eva.py` | Blank airlock / EVA page. |
-| `views/data.py` | Blank data page; no imports or exports are implemented. |
-| `frontend/styles.css` | Minimal shared layout, branding and navigation styling. |
-| `frontend/map/` | Editable SVG drawing (`index.html`), map styling (`map.css`) and interactions (`map.js`). |
-| `components/base_map.py` | Streamlit component wrapper; passes names to the map and validates/deduplicates navigation events. |
-| `services/` | Workspace for future data, validation, storage and APIs. |
-| `data/` | Workspace for your own safe datasets. |
-| `tests/test_app.py` | Blank-page navigation integration tests. |
-| `.streamlit/config.toml` | Safe theme and Streamlit settings. |
-| `Astrocyte.code-workspace` | Project interpreter and debug launcher. |
-| `requirements.txt` | Existing runtime packages, available as the team builds features. |
+| `views/home.py` | Displays the map and handles its selected destination. |
+| `components/base_map.py` | Passes metadata/accent into the iframe; validates and deduplicates returned navigation messages. |
+| `models/areas.py` | `HABITAT_AREAS` defines all seven spaces; original `AREAS` preserves older pages. |
+| `frontend/map/index.html` | Original isometric artwork: terrain, habitat links, service road and seven distinct facilities. |
+| `frontend/map/map.css` | Borderless map, labels, focus/hover highlights, space guide and mobile layout. |
+| `frontend/map/map.js` | Preview, accessible activation, mobile guide and Streamlit messaging. |
+| `views/living.py` | Main living and working quarters. |
+| `views/life_support.py` | Environmental control and life support. |
+| `views/science.py` | Labs and maintenance workshops. |
+| `views/exercise.py` | Exercise quarters; retains the existing exercise route. |
+| `views/power.py` | Power generation and storage. |
+| `views/greenhouse.py` | Greenhouse. |
+| `views/launch.py` | Spaceship and launch area. |
+| `components/sidebar.py` | Existing logo and crew navigation. |
+| `views/Alex.py`, `models/astronauts.py` | Team-owned crew work, preserved. |
+| `views/data.py` | Existing blank data page. |
+| `frontend/styles.css` | Shared page/brand styling; the user's logo spacing is retained. |
+| `tests/test_app.py` | Map/page contracts, legacy route smoke checks and crew navigation. |
 
-There is no `pages/` directory because navigation is explicit. The old shared `views/dashboard.py` has been removed: every area now has its own file. Old data services, sample readings and health widgets have also been removed. The homepage now has a small editable map starter.
+The older sleep, medical, nutrition, wellbeing and EVA view files are retained. The new map does not overwrite or repurpose them. There is no Streamlit automatic `pages/` directory.
 
-## Navigation
+## Flow
 
-Sidebar button → updates `st.session_state.page` → Streamlit reruns `app.py` → `VIEWS[page]()` calls the selected page's `render()`.
+The component receives all copy from `HABITAT_AREAS`. Hover/focus updates a local description card and selects the matching guide row. Activation sends `{area, event_id}` to Python. The validated area is placed in `st.session_state.page`, then Streamlit reruns and displays its registered view.
 
-Map click or keyboard activation → JavaScript sends `{area, event_id}` → `components/base_map.py` checks the message → `views/home.py` sets `st.session_state.page` and reruns the app.
+Only navigation state is added by the map. No health scores, system statuses, live data or operational readiness conclusions are generated. Descriptions explain the roles of concept facilities.
 
-An unknown page ID returns to `home`. A repeated map event is ignored so returning home does not reopen the last building. The template keeps only navigation state; it loads and saves no health data.
+## Working on it
 
-## Adding your own content
+For illustration/styling, edit the commented zone groups in `frontend/map/index.html` and `map.css`. For page content, edit that zone's own view. For copy and labels, change `HABITAT_AREAS`. Adding a zone requires a registry entry, SVG region, registered view and updated integration/browser checks.
 
-Edit a page's `render()` function. Import reusable elements from `components/` and data logic from `services/` when your team implements those modules.
-
-To add another habitat area: add its name/icon to `models/areas.py`, create `views/your_page.py` with `render()`, import it in `app.py`, and add its ID/function to `VIEWS`. Update the navigation tests when you introduce content or new destinations.
-
-## Historical guide
-
-`docs/code-layout-guide.html`, if present, describes the previous full prototype and is preserved unchanged. It is not the current architecture. The previous implementation is available from Git commit `aef6f9d` if the team wants to reuse a piece later.
+See `frontend/map/README.md` for exact IDs and interaction behaviour. `docs/code-layout-guide.html` is historical documentation for an earlier prototype and does not describe this map revision.
