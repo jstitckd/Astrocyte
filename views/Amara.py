@@ -862,6 +862,499 @@ def graphs():
             why="Tracks cumulative metabolic workload so flight surgeons can prevent overexertion before EVA shifts.",
         )
 
+    # --- Section 5: menstrual cycle (amara_menstrual_cycle.csv) ----------------
+    # PASTE THIS BLOCK inside graphs(), directly above the final
+    # `return round(health_summary["overall"] / 10.0, 1)` line.
+
+    PHASES = {
+        "menstrual": ("Menstrual", "#FF5A4D"),
+        "follicular": ("Follicular", "#6FD3FF"),
+        "ovulatory": ("Ovulatory", "#FFC857"),
+        "luteal": ("Luteal", "#B7E36B"),
+        "late_luteal": ("Late luteal", "#A78BFA"),
+    }
+    FLOW_LEVEL = {"none": 0, "spotting": 1, "light": 2, "moderate": 3, "heavy": 4}
+    LH_LEVEL = {"negative": 0, "high": 1, "peak": 2}
+
+    CYCLE_CSS = """
+    <style>
+    .phase-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 16px; }
+    .phase-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+    .phase-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); display: inline-block; }
+
+    .cy-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin-top: 6px; }
+    @media (max-width: 900px) { .cy-grid { grid-template-columns: repeat(6, 1fr); } }
+    @media (max-width: 520px) { .cy-grid { grid-template-columns: repeat(4, 1fr); } }
+    .cy-cell {
+        background: #0F1215; border-radius: 12px; border-top: 3px solid var(--ph);
+        padding: 8px 9px 7px 9px; display: flex; flex-direction: column; gap: 1px; min-width: 0;
+        transition: transform 0.12s ease, background 0.12s ease; cursor: default;
+    }
+    .cy-cell:hover { background: #181C20; transform: translateY(-2px); }
+    .cy-cell.cy-today { outline: 1.5px solid #F2F4F5; outline-offset: -1px; background: #181C20; }
+    .cy-date { font-size: 11px; color: var(--text-muted); }
+    .cy-day { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 600; color: var(--text-primary); line-height: 1.1; }
+    .cy-day small { font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 400; color: var(--text-muted); margin-right: 1px; }
+    .cy-marks { display: flex; align-items: center; gap: 3px; height: 10px; margin-top: 4px; }
+    .cy-flow { width: 6px; height: 6px; border-radius: 50%; background: #FF5A4D; display: inline-block; }
+    .cy-lh { width: 7px; height: 7px; background: #FFC857; transform: rotate(45deg); box-sizing: border-box; display: inline-block; margin: 0 2px; }
+    .cy-lh.hollow { background: transparent; border: 1.5px solid #FFC857; }
+    .cy-sym { width: 6px; height: 6px; border-radius: 2px; background: #F2F4F5; display: inline-block; }
+    .cy-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--divider); }
+    .cy-legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+    </style>
+    """
+    st.markdown(CYCLE_CSS, unsafe_allow_html=True)
+
+    @st.cache_data
+    def load_cycle():
+        return pd.read_csv(resolve_csv("amara_menstrual_cycle.csv"))
+
+    def fmt_d(ts) -> str:
+        return f"{ts.strftime('%b')} {ts.day}"
+
+    def phase_info(key: str):
+        return PHASES.get(key, (str(key).replace("_", " ").capitalize(), "#6E7A83"))
+
+    def pretty_symptom(s: str) -> str:
+        return s.replace("mild_", "").replace("_", " ")
+
+    def arc_path(cx: float, cy: float, r: float, a0: float, a1: float) -> str:
+        """SVG arc between two angles (degrees, 0 = top, clockwise)."""
+        def pt(a):
+            rad = np.radians(a - 90.0)
+            return cx + r * np.cos(rad), cy + r * np.sin(rad)
+        x0, y0 = pt(a0)
+        x1, y1 = pt(a1)
+        large = 1 if (a1 - a0) > 180 else 0
+        return f"M {x0:.2f} {y0:.2f} A {r} {r} 0 {large} 1 {x1:.2f} {y1:.2f}"
+
+    # ---- data prep ------------------------------------------------------------
+    df_cy = load_cycle().copy()
+    df_cy["date_dt"] = pd.to_datetime(df_cy["date"], format="%m/%d/%Y")
+    df_cy = df_cy.sort_values("date_dt").reset_index(drop=True)
+    df_cy["idx"] = np.arange(len(df_cy))
+    df_cy["date_short"] = df_cy["date_dt"].apply(fmt_d)
+    df_cy["flow_lvl"] = df_cy["menstrual_flow"].map(FLOW_LEVEL).fillna(0).astype(int)
+    df_cy["lh_lvl"] = df_cy["ovulation_lh_test"].map(LH_LEVEL).fillna(0).astype(int)
+    df_cy["symptom_raw"] = df_cy["reported_symptoms"].fillna("none").astype(str)
+    df_cy["symptom_list"] = df_cy["symptom_raw"].apply(lambda s: [x for x in s.split(";") if x and x != "none"])
+    df_cy["symptom_n"] = df_cy["symptom_list"].apply(len)
+    n_cy = len(df_cy)
+
+    cur = df_cy.iloc[-1]
+    cur_date = cur["date_dt"]
+    cur_cycle = int(cur["cycle_number"])
+    cur_day = int(cur["cycle_day"])
+    cur_phase_name, cur_phase_col = phase_info(str(cur["cycle_phase"]))
+
+    cyc = df_cy[df_cy["cycle_number"] == cur_cycle]
+    prev = df_cy[df_cy["cycle_number"] < cur_cycle]
+    cycle_len = int(prev["cycle_day"].max()) if not prev.empty else 28
+    cycle_len = max(cycle_len, cur_day)
+    cycle_start = cur_date - pd.Timedelta(days=cur_day - 1)
+    next_period = cycle_start + pd.Timedelta(days=cycle_len)
+    days_to_next = max((next_period - cur_date).days, 0)
+
+    # ovulation / temperature shift
+    peak_rows = cyc[cyc["ovulation_lh_test"] == "peak"]
+    ovu = peak_rows.iloc[0] if not peak_rows.empty else None
+    fol_t = cyc.loc[cyc["cycle_phase"] == "follicular", "basal_body_temp_c"].astype(float)
+    coverline = float(fol_t.max()) + 0.05 if not fol_t.empty else None
+    post = cyc[cyc["idx"] > ovu["idx"]] if ovu is not None else cyc.iloc[0:0]
+    fol_mean = float(fol_t.mean()) if not fol_t.empty else None
+    post_mean = float(post["basal_body_temp_c"].mean()) if not post.empty else None
+    shift = (post_mean - fol_mean) if (fol_mean is not None and post_mean is not None) else None
+    days_above = int((post["basal_body_temp_c"] > coverline).sum()) if (coverline is not None and not post.empty) else 0
+    ovu_confirmed = ovu is not None and days_above >= 3
+
+    if ovu is not None:
+        fw_start = ovu["date_dt"] - pd.Timedelta(days=5)
+        fw_end = ovu["date_dt"] + pd.Timedelta(days=1)
+        fertile_txt = "Open" if fw_start <= cur_date <= fw_end else ("Closed" if cur_date > fw_end else "Upcoming")
+        fw_range = f"{fmt_d(fw_start)} – {fmt_d(fw_end)}"
+    else:
+        fertile_txt, fw_range = "Not detected", ""
+
+    st.markdown('<div class="section-title">Menstrual cycle</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="section-sub">Cycle {cur_cycle} · day {cur_day} of {cycle_len} · {cur_phase_name.lower()} phase</div>',
+        unsafe_allow_html=True,
+    )
+
+    # ---- hero: phase ring + key milestones --------------------------------------
+    prev_phase = {int(r.cycle_day): r.cycle_phase for r in prev.itertuples()}
+    cur_phase_map = {int(r.cycle_day): r.cycle_phase for r in cyc.itertuples()}
+    seg_deg = 360.0 / cycle_len
+    seg_gap = 3.0
+    segs = []
+    for d in range(1, cycle_len + 1):
+        observed = d in cur_phase_map
+        ph = cur_phase_map.get(d, prev_phase.get(d, "luteal"))
+        col = phase_info(str(ph))[1]
+        a0, a1 = (d - 1) * seg_deg + seg_gap / 2, d * seg_deg - seg_gap / 2
+        segs.append(
+            f'<path d="{arc_path(92, 92, 76, a0, a1)}" fill="none" stroke="{col}" stroke-width="12" '
+            f'stroke-opacity="{1.0 if observed else 0.26}" />'
+        )
+    mid = np.radians((cur_day - 0.5) * seg_deg - 90.0)
+    mx, my = 92 + 76 * np.cos(mid), 92 + 76 * np.sin(mid)
+    ring_svg = (
+        f'<svg width="184" height="184" viewBox="0 0 184 184" role="img" aria-label="Cycle day {cur_day} of {cycle_len}">'
+        + "".join(segs)
+        + f'<circle cx="{mx:.2f}" cy="{my:.2f}" r="8" fill="#FFFFFF" stroke="{cur_phase_col}" stroke-width="3" />'
+        + "</svg>"
+    )
+
+    def cy_pillar(name, value, sub, pct, col):
+        return (
+            f'<div class="pillar-box"><span class="pillar-name">{name}</span>'
+            f'<span class="pillar-val">{value}</span>'
+            f'<div class="pillar-bar"><span style="width:{pct:.0f}%; background:{col};"></span></div>'
+            f'<span class="pillar-sub">{sub}</span></div>'
+        )
+
+    next_val = f"{days_to_next} day" + ("" if days_to_next == 1 else "s")
+    pillars_html = cy_pillar(
+        "Next period", next_val, f"Expected {fmt_d(next_period)}", cur_day / cycle_len * 100.0, cur_phase_col
+    )
+    if ovu is not None:
+        pillars_html += cy_pillar(
+            "Ovulation", fmt_d(ovu["date_dt"]), f"LH peak · cycle day {int(ovu['cycle_day'])}",
+            100.0 if ovu_confirmed else 50.0, PHASES["ovulatory"][1],
+        )
+    else:
+        pillars_html += cy_pillar("Ovulation", "Pending", "No LH peak yet", 0.0, PHASES["ovulatory"][1])
+    if shift is not None:
+        pillars_html += cy_pillar(
+            "Temperature shift", f"{shift:+.2f} °C", "Post-ovulation vs follicular",
+            min(max(shift / 0.5, 0.0), 1.0) * 100.0, ACCENTS["orange"],
+        )
+    else:
+        pillars_html += cy_pillar("Temperature shift", "–", "Awaiting ovulation", 0.0, ACCENTS["orange"])
+
+    legend_html = "".join(
+        f'<span class="phase-chip" style="--c:{col};"><i></i>{name}</span>' for name, col in PHASES.values()
+    )
+    pill_bg = hex_to_rgba(cur_phase_col, 0.14)
+
+    with st.container(border=True, key="hero_cycle"):
+        st.markdown(
+            html(f"""
+            <div class="hero-wrap">
+                <div class="hero-gauge">
+                    {ring_svg}
+                    <div class="hero-gauge-center">
+                        <div class="hero-score-num">{cur_day}</div>
+                        <div class="hero-score-sub">of {cycle_len}-day cycle</div>
+                    </div>
+                </div>
+                <div class="hero-details">
+                    <div class="tile-top" style="margin-bottom: 8px;">
+                        <span class="status-pill" style="background:{pill_bg}; color:{cur_phase_col};">
+                            <span class="status-dot" style="background:{cur_phase_col};"></span>{cur_phase_name} phase
+                        </span>
+                    </div>
+                    <div class="tile-tip" style="min-height:0; margin-top:0;">
+                        Cycle {cur_cycle} began {fmt_d(cycle_start)}. Faded segments are projected from the previous cycle.
+                    </div>
+                    <div class="hero-pillars">{pillars_html}</div>
+                    <div class="phase-legend">{legend_html}</div>
+                </div>
+            </div>
+            """),
+            unsafe_allow_html=True,
+        )
+
+    # ---- basal body temperature chart (full width) --------------------------------
+    temps = df_cy["basal_body_temp_c"].astype(float)
+    t_min, t_max = float(temps.min()), float(temps.max())
+    t_span = max(t_max - t_min, 0.1)
+    y_floor_c = t_min - t_span * 0.30
+    y_ceil_c = t_max + t_span * 0.24
+    flow_y = y_floor_c + t_span * 0.07
+
+    fig_bbt = go.Figure()
+
+    # phase bands + labels
+    runs = []
+    for i, ph in enumerate(df_cy["cycle_phase"]):
+        if runs and runs[-1][0] == ph:
+            runs[-1][2] = i
+        else:
+            runs.append([ph, i, i])
+    for ph, a, b in runs:
+        p_name, p_col = phase_info(str(ph))
+        fig_bbt.add_vrect(x0=a - 0.5, x1=b + 0.5, fillcolor=hex_to_rgba(p_col, 0.09), layer="below", line_width=0)
+        fig_bbt.add_annotation(
+            x=(a + b) / 2, y=1.0, yref="paper", yanchor="bottom", showarrow=False, text=p_name.upper(),
+            font=dict(family="Barlow, sans-serif", size=10, color=p_col),
+        )
+
+    # new-cycle divider
+    cyc_first_idx = int(cyc["idx"].min())
+    if cyc_first_idx > 0:
+        fig_bbt.add_vline(x=cyc_first_idx - 0.5, line=dict(color="rgba(255,255,255,0.22)", width=1, dash="dot"), layer="below")
+
+    # coverline
+    if coverline is not None:
+        fig_bbt.add_hline(
+            y=coverline, line=dict(color=hex_to_rgba(ACCENTS["amber"], 0.55), width=1, dash="dash"), layer="below",
+            annotation_text="Coverline", annotation_position="top left",
+            annotation_font=dict(family="Barlow, sans-serif", size=10, color=hex_to_rgba(ACCENTS["amber"], 0.85)),
+        )
+
+    # temperature line with gradient fill
+    fig_bbt.add_trace(
+        go.Scatter(x=df_cy["idx"], y=[y_floor_c] * n_cy, mode="lines", line=dict(width=0, color="rgba(0,0,0,0)"),
+                   hoverinfo="skip", showlegend=False)
+    )
+    fig_bbt.add_trace(
+        go.Scatter(
+            x=df_cy["idx"], y=temps, mode="lines", name="Basal temperature",
+            line=dict(color=ACCENTS["orange"], width=2.5, shape="spline", smoothing=0.4),
+            fill="tonexty",
+            fillgradient=dict(
+                type="vertical", start=y_floor_c, stop=t_max,
+                colorscale=[[0.0, hex_to_rgba(ACCENTS["orange"], 0.0)], [1.0, hex_to_rgba(ACCENTS["orange"], 0.16)]],
+            ),
+            hoverinfo="skip",
+        )
+    )
+    # per-day markers coloured by phase
+    fig_bbt.add_trace(
+        go.Scatter(
+            x=df_cy["idx"], y=temps, mode="markers", showlegend=False,
+            marker=dict(size=7, color=[phase_info(str(p))[1] for p in df_cy["cycle_phase"]], line=dict(color="#14171A", width=1.5)),
+            customdata=[[r.date_short, int(r.cycle_day), phase_info(str(r.cycle_phase))[0]] for r in df_cy.itertuples()],
+            hovertemplate="%{customdata[0]} · cycle day %{customdata[1]}<br>%{customdata[2]} · %{y:.2f} °C<extra></extra>",
+        )
+    )
+    # menstrual flow dots along the bottom
+    flow_df = df_cy[df_cy["flow_lvl"] > 0]
+    if not flow_df.empty:
+        fig_bbt.add_trace(
+            go.Scatter(
+                x=flow_df["idx"], y=[flow_y] * len(flow_df), mode="markers", name="Menstrual flow",
+                marker=dict(size=[6 + 3 * int(v) for v in flow_df["flow_lvl"]], color="#FF5A4D", opacity=0.9),
+                customdata=[f"{r.date_short} · {r.menstrual_flow} flow" for r in flow_df.itertuples()],
+                hovertemplate="%{customdata}<extra></extra>",
+            )
+        )
+    # LH surge diamonds (filled = peak, hollow = high)
+    lh_df = df_cy[df_cy["lh_lvl"] > 0]
+    if not lh_df.empty:
+        fig_bbt.add_trace(
+            go.Scatter(
+                x=lh_df["idx"], y=lh_df["basal_body_temp_c"].astype(float) + t_span * 0.13, mode="markers", name="LH surge",
+                marker=dict(
+                    symbol="diamond", size=12,
+                    color=[ACCENTS["amber"] if v == 2 else "rgba(0,0,0,0)" for v in lh_df["lh_lvl"]],
+                    line=dict(color=ACCENTS["amber"], width=2),
+                ),
+                customdata=[f"{r.date_short} · LH {r.ovulation_lh_test}" for r in lh_df.itertuples()],
+                hovertemplate="%{customdata}<extra></extra>",
+            )
+        )
+    # today marker
+    fig_bbt.add_trace(
+        go.Scatter(
+            x=[int(cur["idx"])], y=[float(cur["basal_body_temp_c"])], mode="markers", showlegend=False,
+            marker=dict(size=11, color="#FFFFFF", line=dict(color=ACCENTS["orange"], width=3)),
+            customdata=[cur["date_short"]], hovertemplate="%{customdata}, %{y:.2f} °C<extra></extra>",
+        )
+    )
+
+    cy_ticks = pick_ticks(n_cy, 7)
+    cy_tick_text = [df_cy["date_short"].iloc[i] for i in cy_ticks]
+    step = 0.1 if t_span <= 0.8 else 0.25
+    y_ticks = [round(v, 2) for v in np.arange(np.ceil(t_min / step) * step, t_max + 1e-9, step)]
+
+    fig_bbt.update_layout(
+        height=300,
+        margin=dict(l=8, r=8, t=26, b=64),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        hovermode="closest", hoverdistance=40,
+        hoverlabel=dict(bgcolor="#0C0E10", bordercolor="#20262B", font=dict(family="Barlow, sans-serif", size=12, color="#F2F4F5")),
+        showlegend=True,
+        legend=dict(orientation="h", x=0, y=-0.17, yanchor="top", font=dict(family="Barlow, sans-serif", size=11, color="#9AA5AD")),
+        xaxis=dict(
+            range=[-0.8, n_cy - 0.2], tickmode="array", tickvals=cy_ticks, ticktext=cy_tick_text,
+            showgrid=False, zeroline=False, showline=False, fixedrange=True,
+            tickfont=dict(family="Barlow, sans-serif", size=11, color="#6E7A83"),
+        ),
+        yaxis=dict(
+            range=[y_floor_c, y_ceil_c], tickmode="array", tickvals=y_ticks, tickformat=".1f",
+            showgrid=True, gridcolor="#20262B", gridwidth=1, zeroline=False, showline=False, fixedrange=True,
+            tickfont=dict(family="Barlow, sans-serif", size=11, color="#6E7A83"),
+        ),
+    )
+
+    bbt_now = float(cur["basal_body_temp_c"])
+    if shift is not None and shift >= 0.2:
+        bbt_lvl, bbt_txt = "safe", "Biphasic"
+        bbt_tip = f"Up {shift:+.2f} °C from the follicular baseline, a clear post-ovulation rise."
+    elif shift is not None:
+        bbt_lvl, bbt_txt = "caution", "Flat"
+        bbt_tip = f"Only {shift:+.2f} °C above the follicular baseline; the post-ovulation rise is weak."
+    else:
+        bbt_lvl, bbt_txt = "safe", "Tracking"
+        bbt_tip = "Ovulation not yet detected; temperature is tracked against the follicular baseline."
+
+    render_tile(
+        "Basal body temperature", bbt_txt, bbt_lvl, f"{bbt_now:.2f}", "°C", fig_bbt, bbt_tip,
+        subrows=[
+            ("Follicular average", f"{fol_mean:.2f} °C" if fol_mean is not None else "–"),
+            ("Post-ovulation average", f"{post_mean:.2f} °C" if post_mean is not None else "–"),
+            ("Coverline", f"{coverline:.2f} °C" if coverline is not None else "–"),
+        ],
+        measures="Resting body temperature taken on waking, logged daily alongside LH tests and flow.",
+        why="A sustained rise after the LH peak confirms ovulation and shows whether the cycle is stable under mission stress.",
+    )
+
+    # ---- three summary tiles --------------------------------------------------------
+    x_cy = [0, max(n_cy - 1, 1)]
+    flow_labels = [f"{r.date_short} · " + ("no flow" if r.flow_lvl == 0 else f"{r.menstrual_flow} flow") for r in df_cy.itertuples()]
+    lh_labels = [f"{r.date_short} · LH {r.ovulation_lh_test}" for r in df_cy.itertuples()]
+    sym_labels = [
+        f"{r.date_short} · " + (", ".join(pretty_symptom(s) for s in r.symptom_list) if r.symptom_list else "no symptoms")
+        for r in df_cy.itertuples()
+    ]
+
+    m1, m2, m3 = st.columns(3)
+
+    with m1:
+        bleed = cyc[cyc["flow_lvl"] > 0]
+        bleed_days = len(bleed)
+        flow_now = int(cur["flow_lvl"]) > 0
+        if bleed_days:
+            peak_row = bleed.loc[bleed["flow_lvl"].idxmax()]
+            peak_flow, peak_day = str(peak_row["menstrual_flow"]), int(peak_row["cycle_day"])
+            period_end = bleed["date_dt"].max()
+            fl_lvl, fl_txt = ("safe", "Active") if flow_now else ("safe", "Completed")
+            fl_tip = (
+                f"Day {cur_day} of your period; flow has peaked at {peak_flow} so far."
+                if flow_now else
+                f"Peaked at {peak_flow} flow on cycle day {peak_day}; bleeding ended {fmt_d(period_end)}."
+            )
+            fl_sub = [("Period start", fmt_d(cycle_start)), ("Peak flow", f"{peak_flow.capitalize()} · day {peak_day}")]
+        else:
+            fl_lvl, fl_txt, fl_tip = "caution", "None logged", "No bleeding has been logged in the current cycle."
+            fl_sub = [("Period start", "–"), ("Peak flow", "–")]
+        fig_flow = build_sparkline(
+            x_vals=df_cy["idx"], y_vals=df_cy["flow_lvl"], hover_labels=flow_labels, unit="of 4",
+            accent_hex=ACCENTS["orange"], tick_vals=pick_ticks(n_cy), tick_text=[df_cy["date_short"].iloc[i] for i in pick_ticks(n_cy)],
+            x_range=x_cy, now_x=int(cur["idx"]), now_y=int(cur["flow_lvl"]), now_label=cur["date_short"],
+        )
+        render_tile(
+            "Menstrual flow", fl_txt, fl_lvl, f"{bleed_days}", "bleed days", fig_flow, fl_tip, subrows=fl_sub,
+            measures="Daily bleeding intensity on a 0–4 scale: none, spotting, light, moderate, heavy.",
+            why="Flow duration and volume flag hormonal disruption or heavy bleeding that could affect hydration and iron status.",
+        )
+
+    with m2:
+        if ovu is not None:
+            ov_lvl, ov_txt = ("safe", "Confirmed") if ovu_confirmed else ("caution", "Unconfirmed")
+            ov_val, ov_unit = f"Day {int(ovu['cycle_day'])}", "LH peak"
+            surge = cyc[cyc["lh_lvl"] > 0]
+            surge_txt = fmt_d(surge["date_dt"].min()) if len(surge) == 1 else f"{fmt_d(surge['date_dt'].min())} – {fmt_d(surge['date_dt'].max())}"
+            ov_tip = (
+                f"LH surge peaked {fmt_d(ovu['date_dt'])}; temperature has stayed above the coverline for {days_above} days since."
+                if ovu_confirmed else
+                f"LH surge peaked {fmt_d(ovu['date_dt'])}; waiting on a sustained temperature rise to confirm."
+            )
+        else:
+            ov_lvl, ov_txt, ov_val, ov_unit = "caution", "Not detected", "–", ""
+            surge_txt, ov_tip = "–", "No LH peak has been logged in the current cycle."
+        fig_lh = build_sparkline(
+            x_vals=df_cy["idx"], y_vals=df_cy["lh_lvl"], hover_labels=lh_labels, unit="of 2",
+            accent_hex=ACCENTS["amber"], tick_vals=pick_ticks(n_cy), tick_text=[df_cy["date_short"].iloc[i] for i in pick_ticks(n_cy)],
+            x_range=x_cy, now_x=int(cur["idx"]), now_y=int(cur["lh_lvl"]), now_label=cur["date_short"],
+        )
+        render_tile(
+            "Ovulation (LH test)", ov_txt, ov_lvl, ov_val, ov_unit, fig_lh, ov_tip,
+            subrows=[("LH surge", surge_txt), ("Fertile window", f"{fertile_txt} · {fw_range}" if fw_range else fertile_txt)],
+            measures="Urinary luteinising hormone test result: negative, high, or peak.",
+            why="Confirms that ovulation is occurring, which matters for estrogen-dependent bone and cardiovascular health in flight.",
+        )
+
+    with m3:
+        sym_days = int((df_cy["symptom_n"] > 0).sum())
+        all_syms = [s for lst in df_cy["symptom_list"] for s in lst]
+        if sym_days:
+            counts = pd.Series([pretty_symptom(s) for s in all_syms]).value_counts()
+            top_sym, top_n = str(counts.index[0]), int(counts.iloc[0])
+            last_sym_date = df_cy.loc[df_cy["symptom_n"] > 0, "date_dt"].max()
+            since = (cur_date - last_sym_date).days
+            all_mild = all(s.startswith("mild_") or s == "fatigue" for s in all_syms)
+            sy_lvl, sy_txt = ("safe", "Mild") if all_mild else ("caution", "Notable")
+            sy_tip = f"Last reported {fmt_d(last_sym_date)} ({since} days ago)" + ("; every entry was mild." if all_mild else ".")
+            sy_sub = [("Most frequent", f"{top_sym.capitalize()} ×{top_n}"), ("Last reported", fmt_d(last_sym_date))]
+        else:
+            sy_lvl, sy_txt, sy_tip = "safe", "Clear", "No symptoms have been reported in this log."
+            sy_sub = [("Most frequent", "–"), ("Last reported", "–")]
+        fig_sym = build_sparkline(
+            x_vals=df_cy["idx"], y_vals=df_cy["symptom_n"], hover_labels=sym_labels, unit="reported",
+            accent_hex=ACCENTS["ice_blue"], tick_vals=pick_ticks(n_cy), tick_text=[df_cy["date_short"].iloc[i] for i in pick_ticks(n_cy)],
+            x_range=x_cy, now_x=int(cur["idx"]), now_y=int(cur["symptom_n"]), now_label=cur["date_short"],
+        )
+        render_tile(
+            "Reported symptoms", sy_txt, sy_lvl, f"{sym_days}", f"of {n_cy} days", fig_sym, sy_tip, subrows=sy_sub,
+            measures="Self-reported cycle symptoms such as cramping, bloating and fatigue.",
+            why="Tracks how much cycle symptoms intrude on workload, sleep and performance during operations.",
+        )
+
+    # ---- daily log ----------------------------------------------------------------------
+    cells = []
+    for r in df_cy.itertuples():
+        p_name, p_col = phase_info(str(r.cycle_phase))
+        marks = "".join('<i class="cy-flow"></i>' for _ in range(int(r.flow_lvl)))
+        if r.lh_lvl == 2:
+            marks += '<i class="cy-lh"></i>'
+        elif r.lh_lvl == 1:
+            marks += '<i class="cy-lh hollow"></i>'
+        if r.symptom_n > 0:
+            marks += '<i class="cy-sym"></i>'
+        parts = [r.date_short, f"Cycle {int(r.cycle_number)} · day {int(r.cycle_day)}", p_name, f"{r.basal_body_temp_c:.2f} °C"]
+        if r.flow_lvl > 0:
+            parts.append(f"{r.menstrual_flow} flow")
+        if r.lh_lvl > 0:
+            parts.append(f"LH {r.ovulation_lh_test}")
+        if r.symptom_n > 0:
+            parts.append(", ".join(pretty_symptom(s) for s in r.symptom_list))
+        tip_txt = " · ".join(parts)
+        today_cls = " cy-today" if int(r.idx) == n_cy - 1 else ""
+        cells.append(
+            f'<div class="cy-cell{today_cls}" style="--ph:{p_col};" title="{tip_txt}">'
+            f'<span class="cy-date">{r.date_short}</span>'
+            f'<span class="cy-day"><small>D</small>{int(r.cycle_day)}</span>'
+            f'<span class="cy-marks">{marks}</span></div>'
+        )
+
+    log_legend = (
+        '<div class="cy-legend">'
+        + legend_html
+        + '<span><i class="cy-flow"></i>Flow (1–4 dots: spotting → heavy)</span>'
+        + '<span><i class="cy-lh"></i>LH peak</span>'
+        + '<span><i class="cy-lh hollow"></i>LH high</span>'
+        + '<span><i class="cy-sym"></i>Symptoms reported</span>'
+        + "</div>"
+    )
+
+    cells_html = "".join(cells)
+    with st.container(border=True, key="tile_daily_log"):
+        st.markdown(
+            html(f"""
+            <div class="tile-top">
+                <span class="tile-label">Daily log</span>
+                <span class="status-pill" style="background:rgba(154,165,173,0.14); color:#9AA5AD;">{n_cy} days logged</span>
+            </div>
+            <div class="cy-grid">{cells_html}</div>
+            {log_legend}
+            """),
+            unsafe_allow_html=True,
+        )
+    
     # --- Section 2: 30-day recovery & readiness --------------------------------
     st.markdown('<div class="section-title">30-day recovery & readiness</div>', unsafe_allow_html=True)
 
@@ -1102,6 +1595,7 @@ def graphs():
             why="Tracks upper-back and scapular stabilizer strength to prevent shoulder injury during EVA tool handling.",
         )
 
+    
     return round(health_summary["overall"] / 10.0, 1)
 # --- Render amara's Header ---
 def render():
