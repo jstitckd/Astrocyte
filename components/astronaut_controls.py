@@ -1,4 +1,5 @@
 """Shared profile-header actions and their Streamlit dialogs."""
+import html as html_lib
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -6,7 +7,7 @@ from zoneinfo import ZoneInfo
 import streamlit as st
 
 from models.astronauts import Astronauts
-from services.astronaut_tools import profile_data, profile_insights, test_catalogue
+from services.astronaut_tools import profile_data, profile_insights, test_catalogue, test_instructions
 
 
 DIALOG_THEME_CSS = """
@@ -189,37 +190,44 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
     background: #6FD3FF;
 }
 
-/* Test Log active badge & form card */
-.dlg-test-badge {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-    background: #14171A;
-    border: 1px solid #20262B;
-    border-left: 3px solid #6FD3FF;
-    border-radius: 12px;
-    padding: 10px 14px;
-    margin: 6px 0 14px 0;
-}
-.dlg-test-badge-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #F2F4F5;
-}
-.dlg-test-badge-unit {
-    font-size: 12px;
-    font-weight: 500;
-    color: #6FD3FF;
-    background: rgba(111, 211, 255, 0.12);
-    padding: 2px 9px;
-    border-radius: 999px;
-}
+/* Test Log footnote */
 .dlg-footnote {
     font-size: 12px;
     color: #6E7A83;
     margin-top: 10px;
+}
+
+/* Test instructions */
+.dlg-instr {
+    background: #14171A;
+    border: 1px solid #20262B;
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+.dlg-instr-summary {
+    font-size: 13px;
+    color: #D5DBDF;
+    margin-bottom: 10px;
+}
+.dlg-instr-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6FD3FF;
+    margin: 10px 0 4px 0;
+}
+.dlg-instr ol {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #D5DBDF;
+}
+.dlg-instr ol li { margin-bottom: 4px; }
+.dlg-instr-note {
+    font-size: 12px;
+    color: #9AA5AD;
 }
 
 /* Style Streamlit form & inputs inside the dialog */
@@ -401,16 +409,31 @@ def test_log_dialog(astronaut_id):
     )
     test = by_id[selected]
 
-    unit_pill = f'<span class="dlg-test-badge-unit">Unit: {test["unit"]}</span>' if test["unit"] else ""
-    st.markdown(
-        _html(f"""
-        <div class="dlg-test-badge">
-            <span class="dlg-test-badge-name">{test['group']} — {test['label']}</span>
-            {unit_pill}
-        </div>
-        """),
-        unsafe_allow_html=True,
+    # How-to instructions for the selected test (updates when the selection changes)
+    instr = test_instructions(test)
+    esc = html_lib.escape
+    steps_html = "".join(f"<li>{esc(step)}</li>" for step in instr["steps"])
+    equipment_html = (
+        f'<div class="dlg-instr-label">Equipment</div><div class="dlg-instr-note">{esc(instr["equipment"])}</div>'
+        if instr.get("equipment") else ""
     )
+    tips_html = (
+        f'<div class="dlg-instr-label">Tips</div><div class="dlg-instr-note">{esc(instr["tips"])}</div>'
+        if instr.get("tips") else ""
+    )
+    with st.expander("How to perform this test", expanded=True):
+        st.markdown(
+            _html(f"""
+            <div class="dlg-instr">
+                <div class="dlg-instr-summary">{esc(instr['summary'])}</div>
+                {equipment_html}
+                <div class="dlg-instr-label">Steps</div>
+                <ol>{steps_html}</ol>
+                {tips_html}
+            </div>
+            """),
+            unsafe_allow_html=True,
+        )
 
     with st.form(f"test_log_form_{astronaut_id}_{selected}"):
         col_date, col_trial = st.columns(2)
