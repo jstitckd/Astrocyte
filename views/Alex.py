@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 def render_astronaut_header(
     name: str,
     country_code: str,
+    gender: str,
     age: int,
     height_cm: int,
     weight_kg: float,
@@ -27,13 +28,15 @@ def render_astronaut_header(
         <!-- 1. Name, Flag & Demographics -->
         <div>
             <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #888888; margin-bottom: 4px;">
-                CREW TELEMETRY // ACTIVE OPERATOR
+                Pilot
             </div>
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
                 <span style="font-size: 26px; font-weight: 800; line-height: 1.1; color: #fafafa;">{name}</span>
                 <img src="{flag_url}" width="28" style="border-radius: 2px; border: 1px solid #333;" alt="{country_code}">
             </div>
             <div style="display: flex; align-items: center; gap: 14px; font-size: 13px; color: #b0b0b0; font-weight: 500;">
+                <span><strong style="color: #888888; font-size: 11px;">SEX:</strong> {gender}</span>
+                <span style="color: #444444;">|</span>
                 <span><strong style="color: #888888; font-size: 11px;">AGE:</strong> {age} yrs</span>
                 <span style="color: #444444;">|</span>
                 <span><strong style="color: #888888; font-size: 11px;">HEIGHT:</strong> {height_cm} cm</span>
@@ -894,12 +897,13 @@ def graphs ():
 # --- Render Alex's Header ---
 def render():
     render_astronaut_header(
-        name="Cmdr. Alex Vance",
+        name="Alex Vance",
         country_code="us",
+        gender="Male",
         age=38,
         height_cm=182,
         weight_kg=74.5,
-        health_score=9.8,
+        health_score=7.3,
         time_outside="04h 18m",
     )
     graphs()
