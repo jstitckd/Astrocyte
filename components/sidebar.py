@@ -331,7 +331,7 @@ def render_sidebar():
             )
 
         st.divider()
-        _nav("data", "↧   Data & exports")
+        _nav("data", "↧   Data & References")
 
 
 def _nav(page, label):
