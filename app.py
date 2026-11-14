@@ -14,7 +14,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
-st.html(f"<style>{(ROOT / 'frontend' / 'styles.css').read_text()}</style>")
+styles = (ROOT / "frontend" / "styles.css").read_text()
+accent = st.get_option("theme.primaryColor") or "#d093f6"
+st.html(f"<style>{styles}\n:root{{--brand-accent:{accent};}}</style>")
 
 # Each destination has its own file so teammates can edit independently.
 VIEWS = {

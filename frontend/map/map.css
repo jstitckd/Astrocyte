@@ -1,0 +1,198 @@
+/* Main accent comes from theme.primaryColor; other map colours live here. */
+:root {
+  --panel: #1b2327;
+  --border: #42384c;
+  --text: #eeede2;
+  --muted: #b5adbd;
+  --accent: #d093f6;
+  --roof: #e5d5b8;
+  --wall-left: #c4b291;
+  --wall-right: #9d8e73;
+  --greenhouse: #9faf8b;
+  color-scheme: dark;
+  font-family: Arial, Helvetica, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  color: var(--text);
+}
+.map-shell {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--panel);
+}
+header {
+  padding: 22px 25px 0;
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+}
+header p {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+svg {
+  display: block;
+  width: 100%;
+}
+.terrain-edge {
+  fill: #704c38;
+}
+.craters {
+  fill: #8f573e;
+  opacity: .4;
+}
+.paths {
+  fill: none;
+  stroke: #ddbc93;
+  stroke-width: 17;
+  stroke-linejoin: round;
+}
+.path-lines {
+  fill: none;
+  stroke: #f6dab5;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 8;
+  opacity: .7;
+}
+.building {
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.building-shadow {
+  fill: #553e31;
+  opacity: .3;
+  transform: translate(12px, 12px);
+}
+.roof {
+  fill: var(--roof);
+  stroke: var(--roof-stroke, #b5a181);
+  stroke-width: var(--roof-stroke-width, 1px);
+  stroke-dasharray: var(--roof-dash, none);
+}
+.wall-left {
+  fill: var(--wall-left);
+}
+.wall-right {
+  fill: var(--wall-right);
+}
+.roof-seam {
+  stroke: #bca98b;
+  stroke-width: 2;
+  fill: none;
+}
+.window {
+  fill: #47616a;
+  stroke: #ead9ba;
+  stroke-width: 1;
+}
+.greenhouse {
+  --roof: var(--greenhouse);
+  --wall-left: #819376;
+  --wall-right: #64785d;
+}
+.building-label {
+  font-size: 14px;
+  text-anchor: middle;
+  fill: var(--text);
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+.building:hover, .building.selected, .building:focus {
+  --roof: var(--accent);
+  --roof-stroke: #edd8fc;
+  --roof-stroke-width: 3px;
+}
+.building:focus-visible {
+  --roof-dash: 5 3;
+}
+.map-note {
+  fill: var(--muted);
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+.preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 25px;
+  border-top: 1px solid var(--border);
+}
+h2 {
+  font-size: 17px;
+  font-weight: 500;
+  margin: 7px 0 0;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #291735;
+  padding: 11px 15px;
+  font-size: 12px;
+  -webkit-tap-highlight-color: transparent;
+}
+button:disabled {
+  opacity: .4;
+  cursor: default;
+}
+button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+#open-page {
+  white-space: nowrap;
+}
+#open-page span {
+  margin-left: 18px;
+}
+#mobile-buildings {
+  display: none;
+}
+@media (max-width: 640px) {
+  header {
+    padding: 18px 16px 0;
+  }
+  .building-label {
+    display: none;
+  }
+  #mobile-buildings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 16px 16px;
+  }
+  #mobile-buildings button {
+    min-height: 44px;
+    padding: 9px;
+    background: #2b2433;
+    color: var(--text);
+    text-align: left;
+    line-height: 1.5;
+  }
+  #mobile-buildings button[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: #432f53;
+  }
+  .preview {
+    padding: 18px 16px;
+    flex-wrap: wrap;
+  }
+  h2 {
+    font-size: 16px;
+  }
+}

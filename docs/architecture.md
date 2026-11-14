@@ -1,6 +1,6 @@
-# Blank template architecture
+# Template architecture
 
-The app is a navigation shell with eight empty pages. Only the sidebar branding, navigation, theme and page titles are rendered. There are no active health features or data services.
+The app is a navigation shell with an editable interactive homepage map and seven blank destination pages. Shared branding, navigation and theme remain. There are no active health features or data services.
 
 ## File responsibilities
 
@@ -10,7 +10,7 @@ The app is a navigation shell with eight empty pages. Only the sidebar branding,
 | `components/sidebar.py` | Sidebar logo and navigation buttons. |
 | `models/areas.py` | Names and icons for the six habitat areas. |
 | `models/metrics.py` | Empty `METRICS` dictionary for the team to define. |
-| `views/home.py` | Blank homepage. |
+| `views/home.py` | Displays the map and navigates to its selected area. |
 | `views/sleep.py` | Blank sleeping-quarters page. |
 | `views/exercise.py` | Blank exercise page. |
 | `views/medical.py` | Blank medical-bay page. |
@@ -19,7 +19,8 @@ The app is a navigation shell with eight empty pages. Only the sidebar branding,
 | `views/eva.py` | Blank airlock / EVA page. |
 | `views/data.py` | Blank data page; no imports or exports are implemented. |
 | `frontend/styles.css` | Minimal shared layout, branding and navigation styling. |
-| `frontend/map/` | Workspace for your future map assets. |
+| `frontend/map/` | Editable SVG drawing (`index.html`), map styling (`map.css`) and interactions (`map.js`). |
+| `components/base_map.py` | Streamlit component wrapper; passes names to the map and validates/deduplicates navigation events. |
 | `services/` | Workspace for future data, validation, storage and APIs. |
 | `data/` | Workspace for your own safe datasets. |
 | `tests/test_app.py` | Blank-page navigation integration tests. |
@@ -27,13 +28,15 @@ The app is a navigation shell with eight empty pages. Only the sidebar branding,
 | `Astrocyte.code-workspace` | Project interpreter and debug launcher. |
 | `requirements.txt` | Existing runtime packages, available as the team builds features. |
 
-There is no `pages/` directory because navigation is explicit. The old shared `views/dashboard.py` has been removed: every area now has its own file. Old data services, sample readings, widgets and map assets have also been removed to give the team a blank starting point.
+There is no `pages/` directory because navigation is explicit. The old shared `views/dashboard.py` has been removed: every area now has its own file. Old data services, sample readings and health widgets have also been removed. The homepage now has a small editable map starter.
 
 ## Navigation
 
 Sidebar button → updates `st.session_state.page` → Streamlit reruns `app.py` → `VIEWS[page]()` calls the selected page's `render()`.
 
-An unknown page ID returns to `home`. The only application state the skeleton uses is the current page; it loads and saves no health data.
+Map click or keyboard activation → JavaScript sends `{area, event_id}` → `components/base_map.py` checks the message → `views/home.py` sets `st.session_state.page` and reruns the app.
+
+An unknown page ID returns to `home`. A repeated map event is ignored so returning home does not reopen the last building. The template keeps only navigation state; it loads and saves no health data.
 
 ## Adding your own content
 

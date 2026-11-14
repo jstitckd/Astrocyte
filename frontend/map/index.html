@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Astrocyte habitat map</title>
+  <link rel="stylesheet" href="map.css">
+</head>
+<body>
+  <main class="map-shell">
+    <header>
+      <span class="eyebrow">ARES OUTPOST / HABITAT MAP</span>
+      <p>Hover or focus to explore. Click a building to open its page.</p>
+    </header>
+
+    <!-- Edit this SVG to change the terrain, paths and building artwork. -->
+    <svg viewBox="0 0 1000 560" role="group" aria-labelledby="map-title map-description">
+      <title id="map-title">Choose a building in the Mars base</title>
+      <desc id="map-description">Six connected buildings. Use Tab to select a building, then Enter or Space to open its page. On mobile you can also use the labelled buttons beneath the map.</desc>
+      <defs>
+        <linearGradient id="terrain" x1="0" y1="0" x2="1" y2="1">
+          <stop stop-color="#ce9271"/><stop offset="1" stop-color="#975940"/>
+        </linearGradient>
+        <!-- One reusable building. Change its paths to redesign all modules. -->
+        <symbol id="building" viewBox="0 0 180 150">
+          <path class="building-shadow" d="m10 88 90-47 78 45-91 50Z"/>
+          <path class="roof" d="m7 50 87-45 78 43-87 46Z"/>
+          <path class="wall-left" d="m7 50 78 44v43L7 94Z"/>
+          <path class="wall-right" d="m85 94 87-46v43l-87 46Z"/>
+          <path class="roof-seam" d="m31 64 86-45m-60 60 86-45"/>
+          <path class="window" d="m21 71 16 9v14l-16-9Zm29 16 16 9v14l-16-9Zm52 15 17-9v14l-17 9Zm30-16 17-9v14l-17 9Z"/>
+        </symbol>
+      </defs>
+
+      <path class="terrain-edge" d="m70 279 430-222 430 222v16L500 519 70 295Z"/>
+      <path fill="url(#terrain)" d="m70 279 430-222 430 222-430 224Z"/>
+      <g class="craters">
+        <ellipse cx="170" cy="285" rx="26" ry="12"/>
+        <ellipse cx="759" cy="363" rx="18" ry="9"/>
+        <ellipse cx="528" cy="462" rx="28" ry="13"/>
+        <ellipse cx="720" cy="206" rx="16" ry="8"/>
+      </g>
+      <path class="paths" d="m293 221 207 102 204-102M500 323V174M500 323 314 407M500 323 527 434M500 323l267 70"/>
+      <path class="path-lines" d="m293 221 207 102 204-102M500 323V174M500 323 314 407M500 323 527 434M500 323l267 70"/>
+
+      <!-- Change translate(x y) to move a building. Keep data-area IDs stable. -->
+      <g class="building" data-area="exercise" transform="translate(414 80)" role="button" tabindex="0">
+        <use href="#building" width="180" height="150"/>
+        <text class="building-label" x="90" y="-10"></text>
+      </g>
+      <g class="building" data-area="sleep" transform="translate(206 135)" role="button" tabindex="0">
+        <use href="#building" width="180" height="150"/>
+        <text class="building-label" x="90" y="-10"></text>
+      </g>
+      <g class="building" data-area="medical" transform="translate(619 135)" role="button" tabindex="0">
+        <use href="#building" width="180" height="150"/>
+        <text class="building-label" x="90" y="-10"></text>
+      </g>
+      <g class="building" data-area="nutrition" transform="translate(228 310)" role="button" tabindex="0">
+        <use href="#building" width="180" height="150"/>
+        <text class="building-label" x="90" y="165"></text>
+      </g>
+      <g class="building greenhouse" data-area="wellbeing" transform="translate(441 340)" role="button" tabindex="0">
+        <use href="#building" width="180" height="150"/>
+        <text class="building-label" x="90" y="165"></text>
+      </g>
+      <g class="building" data-area="eva" transform="translate(681 300)" role="button" tabindex="0">
+        <use href="#building" width="180" height="150"/>
+        <text class="building-label" x="90" y="165"></text>
+      </g>
+      <text class="map-note" x="50" y="535">SCHEMATIC / NOT TO SCALE</text>
+    </svg>
+
+    <nav id="mobile-buildings" aria-label="Choose a building"></nav>
+    <section class="preview">
+      <div aria-live="polite"><span class="eyebrow">EXPLORE YOUR HABITAT</span><h2 id="selected-name">Choose a building</h2></div>
+      <button id="open-page" type="button" disabled>Open page <span aria-hidden="true">↗</span></button>
+    </section>
+  </main>
+  <script src="map.js"></script>
+</body>
+</html>
