@@ -5,7 +5,7 @@ import streamlit as st
 
 from components.sidebar import render_sidebar
 from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing, Alex, Petrov
-from views import greenhouse, launch, life_support, living, power, science
+from views import greenhouse, launch, life_support, living, power, science, Petrov
 
 ROOT = Path(__file__).resolve().parent
 
@@ -30,7 +30,8 @@ VIEWS = {
     "eva": eva.render,
     "Petrov": Petrov.render,
     "data": data.render,
-    "Alex": Alex.render
+    "Alex": Alex.render,
+    "Petrov": Petrov.render
 }
 
 # Habitat-map destinations; existing crew and health routes remain available.
