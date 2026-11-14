@@ -4,7 +4,7 @@ from pathlib import Path
 import streamlit as st
 
 from components.sidebar import render_sidebar
-from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing
+from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing, Alex
 
 ROOT = Path(__file__).resolve().parent
 
@@ -26,6 +26,7 @@ VIEWS = {
     "wellbeing": wellbeing.render,
     "eva": eva.render,
     "data": data.render,
+    "Alex": Alex.render
 }
 
 if st.session_state.get("page") not in VIEWS:
