@@ -25,8 +25,8 @@ The main purple comes from `theme.primaryColor` in `.streamlit/config.toml`. The
 
 ## Interaction
 
-Desktop hover or keyboard focus updates the description and facility tags. Clicking a building or a space-guide row opens its page. Enter and Space work on the SVG controls and native buttons.
+Hover or keyboard focus highlights a building. Clicking a building opens its page; Enter and Space also work. The Explore the outpost panel, guide list and detail card have been removed, and the illustration fills the available width.
 
-On touch screens, building taps open directly. Space-guide taps preview first; use **Open space** to navigate. The guide becomes a readable two-column list below the illustration. Reduced-motion preferences disable the hover transitions.
+On touch screens, tap a building to open its page directly. Reduced-motion preferences disable hover transitions.
 
 The component sends `{area, event_id}` to Python. The wrapper validates the habitat ID and rejects a replayed event, so returning home does not reopen the last selection. The seven target pages are title-only workspaces for the team. Existing crew navigation and old health pages are preserved.

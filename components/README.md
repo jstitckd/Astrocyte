@@ -4,4 +4,4 @@
 
 `base_map.py` embeds the HTML map and returns a validated page ID once per activation. It is called from `views/home.py`.
 
-No dashboard widgets or data workflows are included in this template.
+`dashboard.py` renders the compact homepage readings and crew summaries. `environment.py` retains a reusable detailed environmental overview; `environment_charts.py` builds its recorded Plotly profiles. Source data and demo logic live in `services/environment.py`, and the scoped styling is in `frontend/environment.css`. See `docs/environment.md` for provenance and monitoring gaps.

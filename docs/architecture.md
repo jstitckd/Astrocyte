@@ -4,7 +4,11 @@
 
 | File | Responsibility |
 | --- | --- |
-| `views/home.py` | Displays the map and handles its selected destination. |
+| `views/home.py` | Composes cabin cards, map, crew summaries and session task list. |
+| `components/environment.py` | Cards, options, source badges and data notes. |
+| `components/environment_charts.py` | Recorded Plotly profiles, gaps and a selected-time marker. |
+| `services/environment.py` | Parsing/snapshot logic, provenance, cabin demo and display units. |
+| `frontend/environment.css` | Scoped overview styling. |
 | `components/base_map.py` | Passes metadata/accent into the iframe; validates and deduplicates returned navigation messages. |
 | `models/areas.py` | `HABITAT_AREAS` defines all seven spaces; original `AREAS` preserves older pages. |
 | `frontend/map/index.html` | Original isometric artwork: terrain, habitat links, service road and seven distinct facilities. |
@@ -36,3 +40,11 @@ Only navigation state is added by the map. No health scores, system statuses, li
 For illustration/styling, edit the commented zone groups in `frontend/map/index.html` and `map.css`. For page content, edit that zone's own view. For copy and labels, change `HABITAT_AREAS`. Adding a zone requires a registry entry, SVG region, registered view and updated integration/browser checks.
 
 See `frontend/map/README.md` for exact IDs and interaction behaviour. `docs/code-layout-guide.html` is historical documentation for an earlier prototype and does not describe this map revision.
+
+## Environmental overview
+
+The homepage uses `components/dashboard.py`, `services/dashboard.py` and `frontend/dashboard.css`; see `docs/homepage-dashboard.md`. `components/environment.py` retains the detailed overview for reuse and is not mounted on the homepage. It adapts the parser, tile/chart approach and cabin formulas from `testing.py` without importing that standalone script's page configuration or global CSS. The original script and weather CSV are unchanged.
+
+CSV bytes pass through the pure service into a selected Sol/LMST `Snapshot`. Each `Reading` records a value, unit and `csv`, `demo` or `missing` source. Demo values are optional; recorded-channel dropouts are not backfilled. Profiles retain gaps and contain no forecast or health thresholds.
+
+Display choices are stored separately from widget keys so they survive navigation in the same Streamlit session. No source file is modified or database used. A file error shows a message while map navigation remains functional. See `docs/environment.md` for the accepted channels and monitoring gaps.

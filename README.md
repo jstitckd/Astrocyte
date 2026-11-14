@@ -52,6 +52,10 @@ Open `Astrocyte.code-workspace`, install Microsoft's Python extension, and run *
 
 The workspace also provides **Run and Debug → Run Astrocyte** (requires the Python Debugger extension).
 
+## Homepage environment
+
+Base overview shows five compact cabin readings, recorded outside conditions, the interactive habitat map with task notifications, and crew summaries on the right. Click a task marker to open assignments and mark them complete. Cabin and crew readings are labelled demo/synthetic data. Tasks persist in the current browser session. See [the homepage editing guide](docs/homepage-dashboard.md).
+
 ## Where to add your content
 
 | Habitat space | Page file |
@@ -90,14 +94,21 @@ The seven destination pages intentionally contain no sample widgets or placehold
 | `frontend/styles.css` | Minimal styling for the shared shell. |
 | `frontend/map/` | Editable map drawing (`index.html`), colours (`map.css`) and interactions (`map.js`). |
 | `components/base_map.py` | Embeds the map and validates building selections. |
-| `services/` | Empty workspace for your own data, validation and storage modules. |
-| `data/` | Empty dataset workspace; no synthetic data is loaded. |
+| `components/dashboard.py` | Homepage cabin cards and crew summaries. |
+| `services/dashboard.py` | Homepage snapshots and sample task assignments. |
+| `frontend/dashboard.css` | Homepage layout and responsive styling. |
+| `components/environment.py` | Reusable detailed environmental overview (not mounted on the homepage). |
+| `components/environment_charts.py` | Recorded Plotly profiles. |
+| `services/environment.py` | Parsing, provenance, cabin demo and units, adapted from `testing.py`. |
+| `frontend/environment.css` | Scoped environmental overview styling. |
+| `services/` | Environmental data processing and space for future validation/storage modules. |
+| `data/` | Synthetic crew telemetry and recovery CSVs. |
 | `tests/test_app.py` | Checks navigation, blank destination pages, map routes and event handling. |
 | `docs/` | Current architecture, interfaces and verification notes. |
 | `.streamlit/config.toml` | Streamlit theme and settings. |
 | `requirements.txt` | Python runtime dependencies. |
 
-Only Streamlit is used by the template. The existing pandas, Plotly and NumPy dependencies remain available for your team to use when adding features.
+The environmental overview uses Streamlit, pandas, Plotly and NumPy. All four are already pinned in `requirements.txt`; this feature adds no new dependencies.
 
 ## Suggested four-person split
 
@@ -114,11 +125,11 @@ Coordinate changes to shared files before editing. See [CONTRIBUTING.md](CONTRIB
 python -m unittest discover -s tests -v
 ```
 
-The six integration tests check habitat and legacy routes, the crew sidebar, blank habitat pages, map-message validation, return navigation and matching Python/SVG IDs. Real-browser checks cover all seven regions and guide links, hover descriptions, keyboard and mobile interactions; see `docs/verification.md`.
+The 17 tests cover habitat/crew navigation, homepage summaries, task completion and persistence, environmental parsing, provenance, missing observations, optional channels, units and chart gaps. Desktop/mobile browser checks also cover task marker clicks and completion. See `docs/homepage-dashboard.md`.
 
 ## What is deliberately absent
 
-The habitat map adds no measurements, forms, checklists, storage, API connection or database. The team's existing crew page remains separate. The **Data & exports** destination is a blank page name, not an implemented feature. Add these pieces as your team designs them.
+The habitat illustration adds no live measurements. Its environmental overview uses a local CSV snapshot and a labelled cabin demo; no API connection, database, clinical thresholds or outdoor-readiness judgement is added. Missing channels are described in the data notes. The team's crew pages remain separate. The **Data & exports** destination is a blank page name, not an implemented feature. Add these pieces as your team designs them.
 
 The previous full prototype remains recoverable from Git history (commit `aef6f9d`). The previously generated `docs/code-layout-guide.html` is preserved as a historical guide to that prototype; it does not describe this simplified layout. Use the current README and architecture notes for the skeleton.
 
