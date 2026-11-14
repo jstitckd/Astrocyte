@@ -1,1 +1,1 @@
-"""Data and workflow logic, independent of the user interface."""
+"""Add your data and workflow services in this package."""

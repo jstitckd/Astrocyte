@@ -1,1 +1,1 @@
-"""Reusable Streamlit UI and the map bridge."""
+"""Shared user-interface components."""

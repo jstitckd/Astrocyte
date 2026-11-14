@@ -1,1 +1,1 @@
-"""Shared contracts. Safe to import without Streamlit."""
+"""Shared page names and future data definitions."""

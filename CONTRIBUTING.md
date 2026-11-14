@@ -1,67 +1,47 @@
-# Working together
+# Working on the blank template together
 
-Each teammate clones the **same repository**, then creates their own `.venv` **inside their clone**. Never send your `.venv` to another person. Follow the exact macOS or Windows commands in [README.md](README.md) and open `Astrocyte.code-workspace` in VS Code.
+Each teammate clones the same repository, creates their own `.venv` inside it, and follows the setup commands in `README.md`. Never commit a virtual environment or credentials.
 
-## Before editing
+## Keep edits independent
 
-1. Tell the team which area you are working on. Follow the owner table in the README; coordinate before changing another owner's files.
-2. Read [docs/interfaces.md](docs/interfaces.md). Agree on changes to IDs, arguments or data schemas before implementing them.
-3. From a clean `main`, get the team's changes and create a branch:
+Each page has its own file under `views/`. Divide those files between teammates and agree before editing a file someone else owns. Person 4 can integrate changes to `app.py`, `components/sidebar.py` and `models/areas.py`; Person 2 can coordinate dependencies in `requirements.txt`.
+
+Use `frontend/` for styling/map assets, `components/` for reusable widgets, `services/` for data/storage logic and `models/` for shared definitions. These are workspaces, not implemented health features.
+
+## Branch workflow
+
+Start from a clean, updated main branch:
 
 ```bash
 git switch main
 git pull --ff-only
-git switch -c feature/your-short-description
+git switch -c feature/your-task
 ```
 
-Use names such as `feature/map-labels`, `feature/csv-provider`, or `feature/nutrition-form`. Person 3 integrates the small entry point and shared area registry; announce changes there to avoid simultaneous edits.
-
-## Work, test and share
+Edit your assigned files, then:
 
 ```bash
-# Run from the Astrocyte repository folder, with .venv activated
-python -m streamlit run app.py
-# Stop with Ctrl+C, then:
 python -m unittest discover -s tests -v
 git status
-git add path/to/the/files/you/changed
-git commit -m "Describe the user-visible change"
-git push -u origin feature/your-short-description
+git add path/to/your/changed_files
+git commit -m "Describe the change"
+git push -u origin feature/your-task
 ```
 
-Replace the example paths with your actual files. Open a pull request on GitHub into `main`. Explain what changed and how you checked it; ask a teammate to review. Keep one feature per pull request. Include screenshots for map/style changes and tests for data/workflow changes.
+Replace example paths and branch names with your own. Open a pull request into `main` and ask a teammate to review it. Keep each request focused on one change. When you add real page content, update that page's expectations in `tests/test_app.py` and add meaningful tests for the new behaviour.
 
-Source, dependency files, safe theme configuration and synthetic data belong in Git. `.gitignore` excludes `.venv`, personal editor settings, caches, secrets and local runtime databases. Double-check `git status` before committing; do not include real health records, API keys or exported private notes.
+After a merge, switch to `main`, run `git pull --ff-only`, and reinstall `requirements.txt` if dependencies changed. Commit unfinished work on your feature branch before switching away.
 
-## Bring in teammates' changes
-
-After a pull request is merged:
-
-```bash
-git switch main
-git pull --ff-only
-python -m pip install -r requirements.txt
-```
-
-If you have uncommitted edits, commit them on your feature branch first, or save them with `git stash push -m "work in progress"`. To update an existing feature branch with current `main` without rewriting its shared history:
+To bring main's changes into an existing feature branch:
 
 ```bash
 git fetch origin
-git switch feature/your-short-description
+git switch feature/your-task
 git merge origin/main
 ```
 
-Do not force-push teammates' branches. If `git pull --ff-only` fails, stop and inspect `git status` and `git log --oneline --graph --all`; coordinate before combining divergent work.
+## Merge conflicts
 
-## If a merge conflicts
+Run `git status`, coordinate with the other file owner, and combine both intended changes in VS Code's merge editor. Remove conflict markers, run the tests, stage the resolved files and commit the merge. To cancel an in-progress merge, use `git merge --abort`. Do not force-push someone else's branch or use a hard reset to hide a conflict.
 
-Run `git status` to see the conflicted files. Ask the owner of the other change what should survive. In VS Code's merge editor, combine the intended changes; remove `<<<<<<<`, `=======`, and `>>>>>>>` markers. Do not blindly choose one whole file. Then:
-
-```bash
-python -m unittest discover -s tests -v
-git add path/to/resolved_file.py
-git commit
-git push
-```
-
-To cancel an in-progress merge and return to the pre-merge state, use `git merge --abort`. Do not delete files or use a hard reset to make a conflict disappear. Ask a teammate when uncertain.
+`.gitignore` excludes environments, personal editor settings, caches, secrets and local runtime data. Review `git status` before committing; do not add private health data or exported personal notes.
