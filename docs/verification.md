@@ -1,4 +1,4 @@
-# Blank template verification
+# Template and starter-map verification
 
 Run from the repository root using the project's environment:
 
@@ -6,11 +6,22 @@ Run from the repository root using the project's environment:
 python -m unittest discover -s tests -v
 ```
 
-Both integration tests pass on macOS with Python 3.12 using Streamlit AppTest:
+All four integration tests pass on macOS with Python 3.12 and Streamlit AppTest:
 
-1. All eight sidebar destinations render without exceptions and show only their page title in the main content area. No metrics, charts, uploads or export controls are loaded.
-2. An unknown saved page ID returns to the homepage.
+1. All eight sidebar routes render without errors; destination pages remain blank apart from their titles. No measurements, health charts, forms, uploads or exports are loaded.
+2. All six map selections open their matching page, and returning home does not replay a previous selection.
+3. Malformed or unknown map messages leave the homepage open.
+4. An unknown saved page ID returns to the homepage.
 
-The previous health-workflow and browser tests were removed together with the features they exercised. Add tests as the team implements its own features, and update the blank-content assertions for pages that gain content.
+Real-browser checks passed using headless Chrome at desktop 1512 × 1100 and touch-enabled mobile emulation 390 × 844:
 
-This template revision was not tested in a real browser, on Windows or on Streamlit Community Cloud. No deployment or GitHub push was performed as part of the blank-template change. The existing `.venv`, workspace launcher and Streamlit entry point are preserved.
+- The homepage and SVG map load successfully.
+- Hover changes the selected building's name and highlight colour.
+- Every building opens the correct destination; returning home works.
+- Tab reaches the next building, and Enter and Space open its page.
+- Mobile labelled buttons preview the building and Open page navigates; direct SVG taps also open the matching page.
+- No uncaught JavaScript errors or Streamlit exceptions occurred.
+
+Desktop and mobile screenshots were inspected. The starter keeps all health dashboards and data services empty; only homepage map navigation has been added.
+
+Windows, physical mobile devices, Safari/Firefox, screen readers and Streamlit Community Cloud were not tested for this revision. No deployment or GitHub push was performed. The existing project environment and workspace launcher are preserved.

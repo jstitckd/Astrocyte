@@ -1,6 +1,6 @@
-# Astrocyte — blank team template
+# Astrocyte — team template
 
-A runnable Streamlit skeleton for your team to build on. Every page contains only its title. The sidebar, logo, dark theme and navigation remain; the previous map, demo readings, dashboards, charts, forms, tasks and import/export workflows have been removed.
+A runnable Streamlit skeleton with an editable interactive Mars-base map on the homepage. All seven destination pages contain only their titles, ready for your team to build on. The sidebar, logo, dark theme and navigation remain; no demo readings, health dashboards, charts, forms, tasks or import/export workflows are active.
 
 ## Run on your current Mac
 
@@ -56,7 +56,7 @@ The workspace also provides **Run and Debug → Run Astrocyte** (requires the Py
 
 | Page | File |
 | --- | --- |
-| Base overview / homepage | `views/home.py` |
+| Base overview / homepage and map connection | `views/home.py` |
 | Sleeping quarters | `views/sleep.py` |
 | Exercise area | `views/exercise.py` |
 | Medical bay | `views/medical.py` |
@@ -65,14 +65,14 @@ The workspace also provides **Run and Debug → Run Astrocyte** (requires the Py
 | Airlock / EVA | `views/eva.py` |
 | Data & exports | `views/data.py` |
 
-Every page has a small `render()` function. Add your Streamlit code below its title, inside that function. There is no common dashboard file to edit; each page can be developed independently.
+Every page has a small `render()` function. Add your Streamlit code below its title, inside that function. The homepage already calls `render_base_map()` and handles its selected destination. There is no common dashboard file to edit; each page can be developed independently.
 
 ```python
 # Example to add inside a page's render() function:
 st.write("Your content goes here.")
 ```
 
-The pages intentionally contain no sample widgets or placeholder instructions on screen.
+The seven destination pages intentionally contain no sample widgets or placeholder instructions on screen.
 
 ## Other folders
 
@@ -83,10 +83,11 @@ The pages intentionally contain no sample widgets or placeholder instructions on
 | `models/areas.py` | Building names and icons used by the sidebar and page titles. |
 | `models/metrics.py` | Empty metric dictionary for the team to define later. |
 | `frontend/styles.css` | Minimal styling for the shared shell. |
-| `frontend/map/` | Empty workspace for your own HTML/CSS/JavaScript map. |
+| `frontend/map/` | Editable map drawing (`index.html`), colours (`map.css`) and interactions (`map.js`). |
+| `components/base_map.py` | Embeds the map and validates building selections. |
 | `services/` | Empty workspace for your own data, validation and storage modules. |
 | `data/` | Empty dataset workspace; no synthetic data is loaded. |
-| `tests/test_app.py` | Checks all eight destinations are blank and reachable. |
+| `tests/test_app.py` | Checks navigation, blank destination pages, map routes and event handling. |
 | `docs/` | Current architecture, interfaces and verification notes. |
 | `.streamlit/config.toml` | Streamlit theme and settings. |
 | `requirements.txt` | Python runtime dependencies. |
@@ -108,13 +109,15 @@ Coordinate changes to shared files before editing. See [CONTRIBUTING.md](CONTRIB
 python -m unittest discover -s tests -v
 ```
 
-The two integration tests exercise all eight routes, verify the main content is blank apart from its title, and check that an unknown page returns to the homepage.
+The four integration tests exercise all eight routes, keep destination pages blank, verify map navigation and reject invalid/repeated map events. Browser checks cover hover, keyboard and mobile interactions; see `docs/verification.md`.
 
 ## What is deliberately absent
 
-No map, measurements, crew/date filters, forms, checklists, import/export implementation, storage, API connection or database is active. The **Data & exports** destination is a blank page name, not an implemented feature. Add these pieces as your team designs them.
+No measurements, crew/date filters, forms, checklists, import/export implementation, storage, API connection or database is active. The **Data & exports** destination is a blank page name, not an implemented feature. Add these pieces as your team designs them.
 
 The previous full prototype remains recoverable from Git history (commit `aef6f9d`). The previously generated `docs/code-layout-guide.html` is preserved as a historical guide to that prototype; it does not describe this simplified layout. Use the current README and architecture notes for the skeleton.
+
+To customise the homepage map, begin with [frontend/map/README.md](frontend/map/README.md). Change colour variables in `map.css`, building positions and shapes in `index.html`, and interaction behaviour in `map.js`.
 
 The project keeps the Streamlit Community Cloud entry point `app.py`. Deployment instructions and team workflows are in the documentation; this local template change has not been pushed or deployed automatically.
 
