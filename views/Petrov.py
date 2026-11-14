@@ -917,9 +917,9 @@ def render():
         render_astronaut_header(
             name="Petrov Volkov",
             country_code="ru",
-            age=98,
-            height_cm=222,
-            weight_kg=50.5,
+            age=48,
+            height_cm=182,
+            weight_kg=78.5,
             health_score=calculated_score,
             time_outside="02h 06m",
         )

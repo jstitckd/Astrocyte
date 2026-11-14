@@ -52,11 +52,23 @@ def go(page):
 
 
 def _inject_sidebar_styles():
+    # Build exact selectors for astronaut buttons using their Streamlit keys
+    astro_btn_selectors = ",\n".join(
+        f'html body section[data-testid="stSidebar"] .st-key-nav_{aid} button'
+        for aid in Astronauts
+    )
+    astro_inner_selectors = ",\n".join(
+        f'html body section[data-testid="stSidebar"] .st-key-nav_{aid} button > div,\n'
+        f'html body section[data-testid="stSidebar"] .st-key-nav_{aid} button [data-testid="stMarkdownContainer"],\n'
+        f'html body section[data-testid="stSidebar"] .st-key-nav_{aid} button p'
+        for aid in Astronauts
+    )
+
     st.markdown(
-        """
+        f"""
         <style>
             /* Keep a narrow sidebar footprint. */
-            html body section[data-testid="stSidebar"] {
+            html body section[data-testid="stSidebar"] {{
                 width: 4.5rem !important;
                 min-width: 4.5rem !important;
                 max-width: 4.5rem !important;
@@ -65,17 +77,17 @@ def _inject_sidebar_styles():
                 visibility: visible !important;
                 overflow: visible !important;
                 z-index: 999999 !important;
-            }
+            }}
 
             /* Hide Streamlit's collapse and resize controls. */
             html body [data-testid="stSidebarCollapseButton"],
-            html body [data-testid="stSidebarResizeHandle"] {
+            html body [data-testid="stSidebarResizeHandle"] {{
                 display: none !important;
-            }
+            }}
 
             /* Expand over the page when hovered. */
             html body section[data-testid="stSidebar"]
-            [data-testid="stSidebarContent"] {
+            [data-testid="stSidebarContent"] {{
                 position: absolute !important;
                 top: 0;
                 left: 0;
@@ -86,44 +98,44 @@ def _inject_sidebar_styles():
                 transition:
                     width 0.22s ease,
                     box-shadow 0.22s ease;
-            }
+            }}
 
             html body section[data-testid="stSidebar"]:hover
-            [data-testid="stSidebarContent"] {
+            [data-testid="stSidebarContent"] {{
                 width: 17.5rem;
                 box-shadow: 8px 0 24px rgba(0, 0, 0, 0.45);
-            }
+            }}
 
             /* Branding. */
-            html body section[data-testid="stSidebar"] .wordmark {
+            html body section[data-testid="stSidebar"] .wordmark {{
                 display: flex;
                 align-items: center;
                 gap: 0.65rem;
                 white-space: nowrap;
                 overflow: hidden;
-            }
+            }}
 
-            html body section[data-testid="stSidebar"] .brand-mark {
+            html body section[data-testid="stSidebar"] .brand-mark {{
                 width: 28px;
                 height: 28px;
                 flex-shrink: 0;
-            }
+            }}
 
             html body section[data-testid="stSidebar"]:not(:hover)
-            .wordmark {
+            .wordmark {{
                 justify-content: center;
                 gap: 0;
-            }
+            }}
 
             html body section[data-testid="stSidebar"]:not(:hover)
-            .brand-name {
+            .brand-name {{
                 display: none;
-            }
+            }}
 
             /* Three dots beneath the logo when compressed.
                Reserve their space so navigation does not jump. */
             html body section[data-testid="stSidebar"]
-            .sidebar-dots {
+            .sidebar-dots {{
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -134,87 +146,113 @@ def _inject_sidebar_styles():
                 opacity: 0.65;
                 user-select: none;
                 pointer-events: none;
-            }
+            }}
 
             html body section[data-testid="stSidebar"]:hover
-            .sidebar-dots {
+            .sidebar-dots {{
                 visibility: hidden;
-            }
+            }}
 
             /* Section heading. */
             html body section[data-testid="stSidebar"]
-            .sidebar-section-heading {
+            .sidebar-section-heading {{
                 margin: 0;
                 padding: 0 0.85rem;
                 font-size: 0.8rem;
                 font-weight: 600;
                 line-height: 1.5rem;
+                text-align: left;
                 white-space: nowrap;
                 overflow: hidden;
                 opacity: 0.7;
-            }
+            }}
 
             html body section[data-testid="stSidebar"]:not(:hover)
-            .sidebar-section-heading {
+            .sidebar-section-heading {{
                 visibility: hidden;
                 opacity: 0;
                 transition: none;
-            }
+            }}
 
             html body section[data-testid="stSidebar"]:hover
-            .sidebar-section-heading {
+            .sidebar-section-heading {{
                 visibility: visible;
                 opacity: 0.7;
                 transition: opacity 0.1s ease 0.22s;
-            }
+            }}
 
             /* Navigation button boxes keep a consistent height. */
             html body section[data-testid="stSidebar"]
-            [data-testid="stButton"] button {
-                height: 2.75rem !important;
+            [data-testid="stButton"] button {{
+                height: auto !important;
                 min-height: 2.75rem !important;
                 min-width: 0 !important;
                 justify-content: flex-start !important;
                 text-align: left !important;
                 white-space: nowrap !important;
                 overflow: hidden !important;
-                padding: 0 0.85rem !important;
-            }
+                padding: 0.45rem 0.85rem !important;
+            }}
 
-            /* Prevent labels from wrapping or shrinking. */
+            /* Force ONLY internal astronaut buttons all the way to the left border. */
+            {astro_btn_selectors} {{
+                display: flex !important;
+                justify-content: flex-start !important;
+                align-items: center !important;
+                padding-left: 0.65rem !important;
+                text-align: left !important;
+            }}
+
+            {astro_inner_selectors} {{
+                display: block !important;
+                width: 100% !important;
+                text-align: left !important;
+                margin-left: 0 !important;
+                margin-right: auto !important;
+            }}
+
+            /* Prevent labels from shrinking. */
             html body section[data-testid="stSidebar"]
-            [data-testid="stButton"] button > * {
+            [data-testid="stButton"] button > * {{
                 flex-shrink: 0 !important;
-            }
+            }}
 
             html body section[data-testid="stSidebar"]
-            [data-testid="stButton"] button p {
+            [data-testid="stButton"] button p {{
                 margin: 0 !important;
-                width: auto !important;
+                line-height: 1.25 !important;
                 white-space: nowrap !important;
                 word-spacing: normal !important;
-            }
+            }}
+
+            /* Style the role subtitle rendered via Markdown emphasis on line 2 in gray. */
+            html body section[data-testid="stSidebar"]
+            [data-testid="stButton"] button p em {{
+                font-style: normal !important;
+                font-size: 0.75rem !important;
+                color: #8a959d !important;
+            }}
 
             /* Hide all text and icons immediately when compressed. */
             html body section[data-testid="stSidebar"]:not(:hover)
-            [data-testid="stButton"] button * {
+            [data-testid="stButton"] button * {{
                 visibility: hidden !important;
                 opacity: 0 !important;
                 transition: none !important;
-            }
+            }}
 
             /* Reveal labels after the sidebar finishes expanding. */
             html body section[data-testid="stSidebar"]:hover
-            [data-testid="stButton"] button * {
+            [data-testid="stButton"] button * {{
                 visibility: visible !important;
                 opacity: 1 !important;
                 transition: opacity 0.1s ease 0.22s !important;
-            }
+            }}
 
             html body section[data-testid="stSidebar"]:not(:hover)
-            [data-testid="stButton"] button {
+            [data-testid="stButton"] button {{
                 padding: 0 !important;
-            }
+            }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -253,7 +291,7 @@ def render_sidebar():
         for astronaut_id, astronaut in Astronauts.items():
             _nav(
                 astronaut_id,
-                f"{astronaut.icon}   {astronaut.name}",
+                f"{astronaut.name}  {astronaut.icon}  \n*{astronaut.role}*",
             )
 
         st.divider()
