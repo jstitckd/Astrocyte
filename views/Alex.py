@@ -1,3 +1,4 @@
+from pathlib import Path
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -73,7 +74,7 @@ def render_astronaut_header(
     with st.container(border=True):
         st.html(header_html)
 
-def graphs ():
+def graphs():
     # ---------------------------------------------------------------------------
     # PAGE CONFIG & GLOBAL STYLES
     # ---------------------------------------------------------------------------
@@ -161,6 +162,7 @@ def graphs ():
         padding: 20px !important;
         border: none !important;
         box-shadow: none !important;
+        overflow: visible !important;
     }
     [class*="st-key-tile"], [class*="st-key-hero"] {
         height: 100%;
@@ -168,6 +170,7 @@ def graphs ():
     [class*="st-key-tile"] > div, [class*="st-key-hero"] > div,
     div[data-testid="stVerticalBlockBorderWrapper"] > div {
         gap: 0 !important;
+        overflow: visible !important;
     }
     /* Prevent nested wrappers from double-padding */
     div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stVerticalBlockBorderWrapper"] {
@@ -181,12 +184,78 @@ def graphs ():
         align-items: center;
         gap: 10px;
         margin-bottom: 8px;
+        position: relative;
+        z-index: 20;
     }
     .tile-label {
         font-size: 14px;
         font-weight: 500;
         color: var(--label-muted);
     }
+
+    /* Info icon & hover popup */
+    .info-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        cursor: help;
+    }
+    .info-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1px solid #454E56;
+        color: #8A959D;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1;
+        transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .info-wrap:hover .info-icon {
+        border-color: #6FD3FF;
+        color: #F2F4F5;
+    }
+    .info-popup {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 24px;
+        width: 245px;
+        background: #0C0E10;
+        border: 1px solid #2A3138;
+        border-radius: 12px;
+        padding: 10px 12px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.72);
+        z-index: 9999;
+        pointer-events: none;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        transform: translateY(-4px);
+    }
+    .info-wrap:hover .info-popup {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .info-popup-title {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #6FD3FF;
+        margin-bottom: 3px;
+    }
+    .info-popup-text {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.4;
+        color: #D5DBDF;
+        white-space: normal;
+    }
+
     .status-pill {
         display: inline-flex;
         align-items: center;
@@ -231,7 +300,7 @@ def graphs ():
         color: var(--tip-text);
         margin-top: 10px;
         line-height: 1.4;
-        min-height: 2.8em; /* two lines, keeps tile footers aligned across a row */
+        min-height: 2.8em;
     }
     .tile-divider {
         border-top: 1px solid var(--divider);
@@ -339,37 +408,43 @@ def graphs ():
         "danger": ("#FF5A4D", "rgba(255, 90, 77, 0.14)"),
     }
 
-
     def hex_to_rgba(hex_color: str, alpha: float) -> str:
         h = hex_color.lstrip("#")
         r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
         return f"rgba({r}, {g}, {b}, {alpha})"
 
-
     def html(markup: str) -> str:
         """Flatten indented HTML so Markdown never mistakes it for a code block."""
         return " ".join(line.strip() for line in markup.strip().splitlines())
 
-
     def pick_ticks(n: int, count: int = 5) -> list:
         return sorted(set(int(round(v)) for v in np.linspace(0, n - 1, count)))
 
+    def resolve_csv(filename: str) -> Path:
+        data_path = Path("data") / filename
+        return data_path if data_path.exists() else Path(filename)
 
     @st.cache_data
     def load_data():
-        df_day = pd.read_csv("data/alex.csv")
-        df_30d = pd.read_csv("data/alex_30days.csv")
-        df_test = pd.read_csv("data/alex_test.csv")
-        return df_day, df_30d, df_test
-
+        df_day = pd.read_csv(resolve_csv("alex.csv"))
+        df_30d = pd.read_csv(resolve_csv("alex_30days.csv"))
+        df_test = pd.read_csv(resolve_csv("alex_test.csv"))
+        df_extra = pd.read_csv(resolve_csv("alex_extra.csv"))
+        return df_day, df_30d, df_test, df_extra
 
     # ---------------------------------------------------------------------------
     # DATA-DRIVEN HEALTH & RECOVERY INDEX (no hardcoded clinical constants)
     # ---------------------------------------------------------------------------
-    def compute_composite_index(df_day: pd.DataFrame, df_30d: pd.DataFrame, df_test: pd.DataFrame) -> dict:
+    def compute_composite_index(
+        df_day: pd.DataFrame,
+        df_30d: pd.DataFrame,
+        df_test: pd.DataFrame,
+        df_extra: pd.DataFrame,
+    ) -> dict:
         latest_day = df_day.iloc[-1]
         latest_30 = df_30d.iloc[-1]
         latest_test = df_test.iloc[-1]
+        latest_extra = df_extra.iloc[-1]
 
         def empirical_percentile_score(val: float, series: pd.Series, higher_is_better: bool = True) -> float:
             s_min, s_max = float(series.min()), float(series.max())
@@ -406,7 +481,7 @@ def graphs ():
         spo2_score = float(np.clip((spo2_now / max(spo2_max, 1.0)) * 100.0, 0.0, 100.0))
         telemetry_pillar = float(np.mean([rhr_score, spo2_score]))
 
-        # 3. Monthly tests
+        # 3. Monthly tests & strength metrics
         grip_score = empirical_percentile_score(
             float(latest_test["dominant_handgrip_best_of_3_kgf"]), df_test["dominant_handgrip_best_of_3_kgf"], True
         )
@@ -419,11 +494,36 @@ def graphs ():
         dxa_score = empirical_percentile_score(
             float(latest_test["dxa_total_hip_bone_density_g_cm2"]), df_test["dxa_total_hip_bone_density_g_cm2"], True
         )
-        test_pillar = float(np.mean([grip_score, pvt_score, memory_score, dxa_score]))
+        imtp_score = empirical_percentile_score(
+            float(latest_extra["isometric_mid_thigh_pull_peak_force_best_of_3_n"]),
+            df_extra["isometric_mid_thigh_pull_peak_force_best_of_3_n"],
+            True,
+        )
+        leg_press_score = empirical_percentile_score(
+            float(latest_extra["seated_leg_press_1rm_kg"]),
+            df_extra["seated_leg_press_1rm_kg"],
+            True,
+        )
+        chest_score = empirical_percentile_score(
+            float(latest_extra["chest_cable_isometric_peak_force_best_of_3_n"]),
+            df_extra["chest_cable_isometric_peak_force_best_of_3_n"],
+            True,
+        )
+        row_score = empirical_percentile_score(
+            float(latest_extra["row_cable_isometric_peak_force_best_of_3_n"]),
+            df_extra["row_cable_isometric_peak_force_best_of_3_n"],
+            True,
+        )
+
+        test_pillar = float(np.mean([
+            grip_score, pvt_score, memory_score, dxa_score,
+            imtp_score, leg_press_score, chest_score, row_score,
+        ]))
 
         overall = int(round(float(np.mean([
             hrv_score, sleep_score, vo2_score, rhr_score, spo2_score,
             grip_score, pvt_score, memory_score, dxa_score,
+            imtp_score, leg_press_score, chest_score, row_score,
         ]))))
 
         return {
@@ -436,14 +536,12 @@ def graphs ():
             "clock": str(latest_day["time_station_clock"])[:5],
         }
 
-
     def level_for_score(score: float) -> str:
         if score >= 75:
             return "safe"
         if score >= 55:
             return "caution"
         return "danger"
-
 
     # ---------------------------------------------------------------------------
     # HERO RING
@@ -504,14 +602,13 @@ def graphs ():
                         <div class="hero-pillars">
                             {pillar("30-day recovery", summary['recovery_pillar'], "HRV · sleep · VO₂ max")}
                             {pillar("Station telemetry", summary['telemetry_pillar'], "Resting HR · SpO₂")}
-                            {pillar("Health test readiness", summary['test_pillar'], "Grip · PVT · memory · DXA")}
+                            {pillar("Health test readiness", summary['test_pillar'], "Grip · PVT · DXA · Strength")}
                         </div>
                     </div>
                 </div>
                 """),
                 unsafe_allow_html=True,
             )
-
 
     # ---------------------------------------------------------------------------
     # SPARKLINE BUILDER
@@ -523,7 +620,6 @@ def graphs ():
     ):
         fig = go.Figure()
 
-        # Vertical range (computed first so the fill can anchor to the chart floor)
         valid_y = [float(v) for v in y_vals if pd.notna(v)]
         if forecast_y is not None:
             valid_y += [float(v) for v in forecast_y if pd.notna(v)]
@@ -534,20 +630,16 @@ def graphs ():
         y_floor = y_min - span * 0.34
         y_ceil = y_max + span * 0.28
 
-        # Night bands
         if night_bands:
             for start_x, end_x in night_bands:
                 fig.add_vrect(x0=start_x, x1=end_x, fillcolor="rgba(255, 255, 255, 0.035)", layer="below", line_width=0)
 
-        # Baseline corridor
         if baseline_band is not None:
             b_low, b_high = baseline_band
             fig.add_hrect(y0=b_low, y1=b_high, fillcolor=hex_to_rgba(accent_hex, 0.09), layer="below", line_width=0)
             for boundary in (b_low, b_high):
                 fig.add_hline(y=boundary, line=dict(color=hex_to_rgba(accent_hex, 0.28), width=1, dash="dot"), layer="below")
 
-        # Invisible floor trace: the gradient fill runs from the line down to the chart floor,
-        # and breaks wherever the main series has gaps.
         fig.add_trace(
             go.Scatter(
                 x=x_vals, y=[y_floor] * len(x_vals), mode="lines",
@@ -569,7 +661,6 @@ def graphs ():
             )
         )
 
-        # Forecast
         if forecast_x is not None and forecast_y is not None:
             fig.add_trace(
                 go.Scatter(
@@ -580,7 +671,6 @@ def graphs ():
                 )
             )
 
-        # "Now" marker
         if now_x is not None and now_y is not None:
             fig.add_trace(
                 go.Scatter(
@@ -617,19 +707,35 @@ def graphs ():
         )
         return fig
 
-
     # ---------------------------------------------------------------------------
     # TILE
     # ---------------------------------------------------------------------------
-    def render_tile(label, status_text, status_level, value_str, unit, fig, tip, subrows=None):
+    def render_tile(label, status_text, status_level, value_str, unit, fig, tip, subrows=None, measures="", why=""):
         solid_col, bg_col = STATUS_STYLES[status_level]
         key = "tile_" + "".join(c if c.isalnum() else "_" for c in label.lower())
+
+        info_html = ""
+        if measures or why:
+            info_html = f"""
+            <span class="info-wrap">
+                <span class="info-icon">i</span>
+                <div class="info-popup">
+                    <div class="info-popup-title">What it measures</div>
+                    <div class="info-popup-text" style="margin-bottom: 6px;">{measures}</div>
+                    <div class="info-popup-title">Why it matters</div>
+                    <div class="info-popup-text">{why}</div>
+                </div>
+            </span>
+            """
 
         with st.container(border=True, key=key):
             st.markdown(
                 html(f"""
                 <div class="tile-top">
-                    <span class="tile-label">{label}</span>
+                    <div style="display: inline-flex; align-items: center; gap: 7px;">
+                        <span class="tile-label">{label}</span>
+                        {info_html}
+                    </div>
                     <span class="status-pill" style="background:{bg_col}; color:{solid_col};">
                         <span class="status-dot" style="background:{solid_col};"></span>{status_text}
                     </span>
@@ -653,13 +759,12 @@ def graphs ():
 
             st.markdown(html(f'<div class="tile-tip">{tip}</div>{subrows_html}'), unsafe_allow_html=True)
 
-
     # ---------------------------------------------------------------------------
     # MAIN
     # ---------------------------------------------------------------------------
-    df_day, df_30d, df_test = [d.copy() for d in load_data()]
+    df_day, df_30d, df_test, df_extra = [d.copy() for d in load_data()]
 
-    health_summary = compute_composite_index(df_day, df_30d, df_test)
+    health_summary = compute_composite_index(df_day, df_30d, df_test, df_extra)
     render_circular_hero(health_summary)
 
     # --- Section 1: live telemetry ---------------------------------------------
@@ -694,10 +799,8 @@ def graphs ():
     hr_obs_max = float(df_day["heart_rate_bpm"].max())
     hr_range = max(hr_obs_max - hr_obs_min, 1.0)
 
-
     def to_strain(hr):
         return (hr - hr_obs_min) / hr_range * 100.0
-
 
     col1, col2, col3 = st.columns(3)
 
@@ -716,6 +819,8 @@ def graphs ():
             "Heart rate", hr_text, hr_level, f"{hr_now}", "bpm", fig_hr,
             f"Currently {activity}; evening settles toward about {sleep_hr_med} bpm overnight.",
             subrows=[("Resting low", f"{int(hr_obs_min)} bpm"), ("Session peak", f"{int(hr_obs_max)} bpm")],
+            measures="Continuous beats per minute across sleep, station tasks, and EVA blocks.",
+            why="Flags acute physical exertion, dehydration, or cardiovascular deconditioning in reduced gravity.",
         )
 
     with col2:
@@ -732,6 +837,8 @@ def graphs ():
             "Oxygen saturation", spo2_text, spo2_level, f"{spo2_now}", "%", fig_spo2,
             f"Lowest reading today was {spo2_min}%, across sleep and work blocks.",
             subrows=[("24h average", f"{df_day['oxygen_saturation_pct'].mean():.1f}%"), ("Minimum", f"{spo2_min}%")],
+            measures="Percentage of oxygen-saturated hemoglobin in arterial blood (SpO₂).",
+            why="Provides early warning of cabin air-scrubber faults, suit pressure drops, or respiratory hypoxia.",
         )
 
     with col3:
@@ -751,6 +858,8 @@ def graphs ():
             "Cardiovascular load", st_text, st_level, f"{now_strain}", "%", fig_strain,
             "Share of today's heart-rate range; projected to ease into the evening.",
             subrows=[("Current block", activity.capitalize()), ("Samples logged", f"{len(df_day)} pts")],
+            measures="Normalized cardiac effort relative to the astronaut's 24-hour resting-to-peak heart-rate range.",
+            why="Tracks cumulative metabolic workload so flight surgeons can prevent overexertion before EVA shifts.",
         )
 
     # --- Section 2: 30-day recovery & readiness --------------------------------
@@ -785,6 +894,8 @@ def graphs ():
         render_tile(
             "Overnight HRV", str(latest_30["hrv_status"]).capitalize(), hrv_level, f"{int(hrv_now)}", "ms", fig_hrv, hrv_tip,
             subrows=[("7-day average", f"{latest_30['hrv_7day_avg_ms']:.1f} ms"), ("Baseline range", f"{base_low}–{base_high} ms")],
+            measures="Millisecond variation between consecutive heartbeats during overnight sleep compared to baseline.",
+            why="Reflects autonomic nervous system balance, highlighting accumulated stress, illness, or under-recovery.",
         )
 
     with c2:
@@ -804,6 +915,8 @@ def graphs ():
         render_tile(
             "Sleep score", sleep_text, sleep_level, f"{sleep_val}", "pts", fig_sleep, sleep_tip,
             subrows=[("30-day average", f"{sleep_avg:.0f} pts"), ("30-day peak", f"{int(df_30d['sleep_score_1_100'].max())} pts")],
+            measures="Composite 1–100 score of sleep duration, deep/REM architecture, and nighttime awakenings.",
+            why="Circadian disruption on Mars/orbit impairs executive judgment, mood stability, and physical tissue repair.",
         )
 
     with c3:
@@ -819,6 +932,8 @@ def graphs ():
             "VO₂ max estimate", vo2_text, vo2_level, f"{vo2_val:.1f}", "ml/kg/min", fig_vo2,
             f"Aerobic capacity changed {vo2_change:+.1f} ml/kg/min over the past 30 days.",
             subrows=[("30-day change", f"{vo2_change:+.1f} ml/kg/min"), ("30-day low", f"{df_30d['vo2_max_estimate_ml_kg_min'].min():.1f} ml/kg/min")],
+            measures="Maximum rate of oxygen consumption per kilogram of body mass during aerobic exercise.",
+            why="Verifies that daily treadmill and cycle countermeasures are preventing aerobic fitness loss.",
         )
 
     # --- Section 3: monthly health tests ---------------------------------------
@@ -852,6 +967,8 @@ def graphs ():
         render_tile(
             "Dominant handgrip", grip_text, grip_level, f"{grip_val:.1f}", "kgf", fig_grip, grip_tip,
             subrows=[("Mission delta", f"{grip_delta:+.1f} kgf"), ("Working memory", f"{int(latest_test['working_memory_2back_accuracy_pct'])}% (2-back)")],
+            measures="Peak isometric squeeze force (kgf) across three dynamometer trials.",
+            why="Tracks neuromuscular strength and forearm endurance critical for pressurized EVA glove operations.",
         )
 
     with t2:
@@ -871,6 +988,8 @@ def graphs ():
         render_tile(
             "Psychomotor vigilance", pvt_text, pvt_level, f"{pvt_val}", "ms", fig_pvt, pvt_tip,
             subrows=[(f"{n_tests}-month best", f"{int(p.min())} ms"), (f"{n_tests}-month average", f"{p.mean():.0f} ms")],
+            measures="Median visual-stimulus reaction speed (ms) during a sustained attention task.",
+            why="Detects subtle cognitive fatigue, sleep debt, or CO₂-induced alertness dips before high-risk maneuvers.",
         )
 
     with t3:
@@ -892,18 +1011,115 @@ def graphs ():
         render_tile(
             "Total hip bone density", dxa_text, dxa_level, f"{dxa_val:.3f}", "g/cm²", fig_dxa, dxa_tip,
             subrows=[("Net change", f"{dxa_delta:+.3f} g/cm²"), (f"{n_tests}-month mean", f"{d.mean():.3f} g/cm²")],
+            measures="Dual-energy X-ray absorptiometry (DXA) bone mineral density (g/cm²) at the proximal femur.",
+            why="Monitors skeletal demineralization caused by reduced mechanical loading on Mars and in transit.",
         )
 
+    # --- Section 4: musculoskeletal & strength tests (alex_extra.csv) --------
+    st.markdown('<div class="section-title">Musculoskeletal & strength tests</div>', unsafe_allow_html=True)
+
+    df_extra["extra_idx"] = np.arange(len(df_extra))
+    df_extra["month_short"] = pd.to_datetime(df_extra["date"]).dt.strftime("%b %Y")
+    latest_extra = df_extra.iloc[-1]
+    n_extra = len(df_extra)
+    textra_vals = pick_ticks(n_extra)
+    textra_text = [pd.to_datetime(df_extra["date"].iloc[i]).strftime("%b") for i in textra_vals]
+    xe = [0, max(n_extra - 1, 1)]
+
+    def strength_status(latest_val: float, series: pd.Series, unit_label: str):
+        delta = latest_val - float(series.iloc[0])
+        if latest_val >= float(series.max()):
+            return "safe", "Peak", f"Highest {unit_label} output across your {n_extra}-month log.", delta
+        if delta >= 0:
+            return "safe", "Maintained", f"Force output is at or above your mission baseline.", delta
+        return "caution", "Below start", f"Down {abs(delta):.1f} from baseline; review resistance load.", delta
+
+    s1, s2, s3 = st.columns(3)
+
+    with s1:
+        imtp_s = df_extra["isometric_mid_thigh_pull_peak_force_best_of_3_n"]
+        imtp_val = int(latest_extra["isometric_mid_thigh_pull_peak_force_best_of_3_n"])
+        imtp_lvl, imtp_txt, imtp_tip, imtp_delta = strength_status(float(imtp_val), imtp_s, "peak pull")
+        fig_imtp = build_sparkline(
+            x_vals=df_extra["extra_idx"], y_vals=imtp_s, hover_labels=df_extra["month_short"], unit="N",
+            accent_hex=ACCENTS["orange"], tick_vals=textra_vals, tick_text=textra_text, x_range=xe,
+            now_x=int(latest_extra["extra_idx"]), now_y=imtp_val, now_label=latest_extra["month_short"],
+        )
+        render_tile(
+            "Isometric mid-thigh pull", imtp_txt, imtp_lvl, f"{imtp_val}", "N", fig_imtp, imtp_tip,
+            subrows=[("Mission delta", f"{imtp_delta:+.0f} N"), (f"{n_extra}-month mean", f"{imtp_s.mean():.0f} N")],
+            measures="Peak vertical ground-reaction force (Newtons) across three maximal mid-thigh pull trials.",
+            why="Evaluates whole-body posterior-chain power required for surface locomotion and sample recovery.",
+        )
+
+    with s2:
+        lp_s = df_extra["seated_leg_press_1rm_kg"]
+        lp_val = float(latest_extra["seated_leg_press_1rm_kg"])
+        lp_lvl, lp_txt, lp_tip, lp_delta = strength_status(lp_val, lp_s, "leg press")
+        fig_lp = build_sparkline(
+            x_vals=df_extra["extra_idx"], y_vals=lp_s, hover_labels=df_extra["month_short"], unit="kg",
+            accent_hex=ACCENTS["lime"], tick_vals=textra_vals, tick_text=textra_text, x_range=xe,
+            now_x=int(latest_extra["extra_idx"]), now_y=lp_val, now_label=latest_extra["month_short"],
+        )
+        render_tile(
+            "Seated leg press 1RM", lp_txt, lp_lvl, f"{lp_val:.1f}", "kg", fig_lp, lp_tip,
+            subrows=[("Mission delta", f"{lp_delta:+.1f} kg"), (f"{n_extra}-month peak", f"{lp_s.max():.1f} kg")],
+            measures="One-repetition maximum (1RM) lower-limb pushing load in kilograms on the resistive exercise unit.",
+            why="Preserves quadriceps and gluteal mass against anti-gravity muscle atrophy during prolonged low-G stays.",
+        )
+
+    with s3:
+        chest_s = df_extra["chest_cable_isometric_peak_force_best_of_3_n"]
+        chest_val = int(latest_extra["chest_cable_isometric_peak_force_best_of_3_n"])
+        chest_lvl, chest_txt, chest_tip, chest_delta = strength_status(float(chest_val), chest_s, "chest press")
+        fig_chest = build_sparkline(
+            x_vals=df_extra["extra_idx"], y_vals=chest_s, hover_labels=df_extra["month_short"], unit="N",
+            accent_hex=ACCENTS["ice_blue"], tick_vals=textra_vals, tick_text=textra_text, x_range=xe,
+            now_x=int(latest_extra["extra_idx"]), now_y=chest_val, now_label=latest_extra["month_short"],
+        )
+        render_tile(
+            "Chest cable isometric force", chest_txt, chest_lvl, f"{chest_val}", "N", fig_chest, chest_tip,
+            subrows=[("Mission delta", f"{chest_delta:+.0f} N"), (f"{n_extra}-month mean", f"{chest_s.mean():.0f} N")],
+            measures="Best-of-three peak horizontal pushing force (Newtons) on the cable resistance rig.",
+            why="Monitors upper-body anterior pressing strength needed for hatch operations and EVA suit donning.",
+        )
+
+    s4, _, _ = st.columns(3)
+
+    with s4:
+        row_s = df_extra["row_cable_isometric_peak_force_best_of_3_n"]
+        row_val = int(latest_extra["row_cable_isometric_peak_force_best_of_3_n"])
+        row_lvl, row_txt, row_tip, row_delta = strength_status(float(row_val), row_s, "cable row")
+        fig_row = build_sparkline(
+            x_vals=df_extra["extra_idx"], y_vals=row_s, hover_labels=df_extra["month_short"], unit="N",
+            accent_hex=ACCENTS["amber"], tick_vals=textra_vals, tick_text=textra_text, x_range=xe,
+            now_x=int(latest_extra["extra_idx"]), now_y=row_val, now_label=latest_extra["month_short"],
+        )
+        render_tile(
+            "Row cable isometric force", row_txt, row_lvl, f"{row_val}", "N", fig_row, row_tip,
+            subrows=[("Mission delta", f"{row_delta:+.0f} N"), (f"{n_extra}-month mean", f"{row_s.mean():.0f} N")],
+            measures="Best-of-three peak horizontal pulling force (Newtons) on the seated cable row rig.",
+            why="Tracks upper-back and scapular stabilizer strength to prevent shoulder injury during EVA tool handling.",
+        )
+
+    return round(health_summary["overall"] / 10.0, 1)
 # --- Render Alex's Header ---
 def render():
-    render_astronaut_header(
-        name="Alex Vance",
-        country_code="us",
-        gender="Male",
-        age=38,
-        height_cm=182,
-        weight_kg=74.5,
-        health_score=7.3,
-        time_outside="04h 18m",
-    )
-    graphs()
+    # 1. Reserve the top spot on the page first
+    header_slot = st.empty()
+
+    # 2. Run graphs() and get the calculated score
+    calculated_score = graphs()
+
+    # 3. Render the header back into the reserved top spot
+    with header_slot.container():
+        render_astronaut_header(
+            name="Alex Vance",
+            country_code="us",
+            gender="Male",
+            age=38,
+            height_cm=182,
+            weight_kg=74.5,
+            health_score=calculated_score,
+            time_outside="04h 18m",
+        )
