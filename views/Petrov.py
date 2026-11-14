@@ -355,9 +355,9 @@ def graphs ():
 
     @st.cache_data
     def load_data():
-        df_day = pd.read_csv("data\petrov.csv")
-        df_30d = pd.read_csv("data\petrov_30days.csv")
-        df_test = pd.read_csv("data\petrov_test.csv")
+        df_day = pd.read_csv("data/petrov.csv")
+        df_30d = pd.read_csv("data/petrov_30days.csv")
+        df_test = pd.read_csv("data/petrov_test.csv")
         return df_day, df_30d, df_test
 
 
@@ -891,15 +891,35 @@ def graphs ():
             "Total hip bone density", dxa_text, dxa_level, f"{dxa_val:.3f}", "g/cm²", fig_dxa, dxa_tip,
             subrows=[("Net change", f"{dxa_delta:+.3f} g/cm²"), (f"{n_tests}-month mean", f"{d.mean():.3f} g/cm²")],
         )
+    return round(health_summary["overall"] / 10.0, 1)
 # --- Render Alex's Header ---
+# def render():
+#     render_astronaut_header(
+#         name="Petrov Volkov",
+#         country_code="ru",
+#         age=98,
+#         height_cm=222,
+#         weight_kg=50.5,
+#         health_score=0.3,
+#         time_outside="02h 06m",
+#     )
+#     graphs()
+
 def render():
-    render_astronaut_header(
-        name="Petrov Volkov",
-        country_code="ru",
-        age=98,
-        height_cm=222,
-        weight_kg=50.5,
-        health_score=0.3,
-        time_outside="02h 06m",
-    )
-    graphs()
+    # 1. Reserve the top spot on the page first
+    header_slot = st.empty()
+
+    # 2. Run graphs() and get the calculated score
+    calculated_score = graphs()
+
+    # 3. Render the header back into the reserved top spot
+    with header_slot.container():
+        render_astronaut_header(
+            name="Petrov Volkov",
+            country_code="ru",
+            age=48,
+            height_cm=182,
+            weight_kg=78.5,
+            health_score=calculated_score,
+            time_outside="02h 06m",
+        )
