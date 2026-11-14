@@ -4,7 +4,7 @@ from pathlib import Path
 import streamlit as st
 
 from components.sidebar import render_sidebar
-from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing, Alex, Petrov, Amara
+from views import data, eva, exercise, home, medical, nutrition, sleep, wellbeing, Alex, Petrov, Amara, Milou
 from views import greenhouse, launch, life_support, living, power, science, Petrov
 
 ROOT = Path(__file__).resolve().parent
@@ -32,6 +32,7 @@ VIEWS = {
     "data": data.render,
     "Alex": Alex.render,
     "Amara": Amara.render,
+    "Milou": Milou.render,
     "Petrov": Petrov.render
 }
 
