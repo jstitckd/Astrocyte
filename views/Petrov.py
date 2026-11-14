@@ -355,9 +355,9 @@ def graphs ():
 
     @st.cache_data
     def load_data():
-        df_day = pd.read_csv("data\petrov.csv")
-        df_30d = pd.read_csv("data\petrov_30days.csv")
-        df_test = pd.read_csv("data\petrov_test.csv")
+        df_day = pd.read_csv("data/petrov.csv")
+        df_30d = pd.read_csv("data/petrov_30days.csv")
+        df_test = pd.read_csv("data/petrov_test.csv")
         return df_day, df_30d, df_test
 
 
