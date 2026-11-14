@@ -18,7 +18,7 @@ class NavigationTests(unittest.TestCase):
     def test_blank_destination_pages_remain_renderable(self):
         app = new_app()
         expected_titles = {
-            "home": "Base overview",
+            "home": "Dashboard",
             "sleep": "Sleeping quarters",
             "medical": "Medical bay",
             "nutrition": "Kitchen",
@@ -49,7 +49,7 @@ class NavigationTests(unittest.TestCase):
         self.assertFalse(app.exception)
         self.assertEqual(app.session_state.page, "Alex")
         app.button(key="nav_home").click().run()
-        self.assertEqual(app.title[0].value, "Base overview")
+        self.assertEqual(app.title[0].value, "Dashboard")
         self.assertFalse(app.exception)
 
     def test_map_opens_each_page_and_does_not_replay_on_return(self):
