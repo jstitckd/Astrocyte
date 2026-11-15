@@ -36,7 +36,7 @@ def crew_card(crew, tasks):
     assigned = sorted((task for task in tasks if task["crew"] == name), key=lambda task: not task["urgent"])
     count = len(assigned)
     status = f'{count} task{"s" if count != 1 else ""} due' if count else "Tasks clear"
-    tone = "amber" if any(task["crew"] == name and task["urgent"] for task in tasks) else "green"
+    tone = "red" if any(task["urgent"] for task in assigned) else "amber" if count else "green"
     score = crew["health_score"]
     score_text = f"{score:g}%" if score is not None else "—"
     colour = score_colour(score) if score is not None else "#8a959d"
@@ -51,7 +51,9 @@ def crew_card(crew, tasks):
             with st.container(border=True, key=f"{prefix}_{task['id']}"):
                 label, action = st.columns([5, 1], gap="small", vertical_alignment="center")
                 with label:
-                    st.html(f'<div class="crew-task-line" title="{escape(task["detail"], quote=True)}"><strong>{escape(task["title"])}</strong><span>Due {escape(task["due"])}</span></div>')
+                    urgency = " urgent" if task["urgent"] else ""
+                    detail = ("Urgent · " if task["urgent"] else "") + task["detail"]
+                    st.html(f'<div class="crew-task-line{urgency}" title="{escape(detail, quote=True)}"><strong>{escape(task["title"])}</strong><span>Due {escape(task["due"])}</span></div>')
                 with action:
                     st.button("✓", help="Mark complete", key=f"complete_{task['id']}", on_click=complete_task, args=(task['id'],))
         st.button(f"Open {name}'s health →", key=f"summary_{name}", width="stretch", on_click=_open_crew, args=(name,))

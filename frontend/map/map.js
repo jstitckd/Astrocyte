@@ -45,6 +45,8 @@
     const layer = document.getElementById("task-markers");
     layer.replaceChildren();
     document.getElementById("task-count").textContent = `${tasks.length} task${tasks.length === 1 ? "" : "s"} due`;
+    document.getElementById("task-count").classList.toggle("urgent", tasks.some(task => task.urgent));
+    document.getElementById("task-count").classList.toggle("clear", tasks.length === 0);
     buildings.forEach(building => building.classList.toggle("has-task", tasks.some(task => task.area === building.dataset.area)));
     tasks.forEach(task => {
       if (!areas.has(task.area)) return;
@@ -52,7 +54,7 @@
       marker.className = "task-marker task-" + task.area + (task.urgent ? " urgent" : "");
       marker.dataset.area = task.area;
       marker.disabled = disabled;
-      marker.setAttribute("aria-label", `${task.crew}: ${task.title}, due ${task.due}. Open task guide`);
+      marker.setAttribute("aria-label", `${task.urgent ? "Urgent task. " : ""}${task.crew}: ${task.title}, due ${task.due}. Open task guide`);
       for (const [tag, text] of [["strong", `${task.crew} · ${task.title}`], ["span", task.detail], ["small", `Due ${task.due}`]]) {
         const line = document.createElement(tag);
         line.textContent = text;

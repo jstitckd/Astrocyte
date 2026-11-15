@@ -19,12 +19,13 @@ class ProfileControlTests(unittest.TestCase):
                 app.session_state.page = name
                 app.run()
                 self.assertFalse(app.exception)
-                self.assertEqual(app.button(key=f"profile_log_{name}").label, "Log a test")
+                self.assertIn("Log a test", app.button(key=f"profile_log_{name}").label)
                 app.button(key=f"profile_summary_{name}").click().run()
                 self.assertFalse(app.exception)
-                self.assertTrue(any(item.value == astronaut.name for item in app.subheader))
-                self.assertTrue(any(item.value == "**Insights**" for item in app.markdown))
-                self.assertTrue(any(item.value == "**Recommendations**" for item in app.markdown))
+                markup = "\n".join(item.value for item in app.markdown)
+                self.assertIn(f'class="dlg-title">{astronaut.name}</div>', markup)
+                self.assertIn("Telemetry insights", markup)
+                self.assertIn("Flight surgeon actions", markup)
 
     def test_catalogue_covers_recorded_measurements_not_derived_fields(self):
         for name in Astronauts:
@@ -43,11 +44,11 @@ class ProfileControlTests(unittest.TestCase):
         # AppTest reruns the whole script instead of the live dialog fragment.
         app = AppTest.from_string("from components.astronaut_controls import test_log_dialog\ntest_log_dialog('Alex')", default_timeout=30).run()
         self.assertFalse(app.exception)
-        submit = next(button for button in app.button if button.label == "Submit")
+        submit = next(button for button in app.button if button.label == "Log measurement")
         submit.click().run()
         self.assertEqual(app.error[0].value, "Enter a measured value before submitting.")
         app.number_input(key="log_value_Alex_dominant_handgrip_best_of_3_kgf").set_value(42.5)
-        next(button for button in app.button if button.label == "Submit").click().run()
+        next(button for button in app.button if button.label == "Log measurement").click().run()
         self.assertFalse(app.exception)
-        self.assertEqual(app.success[0].value, "Data being processed")
+        self.assertEqual(app.success[0].value, "Measurement logged — data is being processed.")
         self.assertEqual(before, {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths})

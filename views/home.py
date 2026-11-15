@@ -35,3 +35,4 @@ def render():
                 environmental_cards(environmental_snapshot())
             except (OSError, ValueError) as exc:
                 st.warning(f"Environmental readings unavailable: {exc}")
+        st.html('<footer class="map-credit">Map design assisted by SI</footer>')

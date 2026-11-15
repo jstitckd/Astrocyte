@@ -8,6 +8,22 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class DashboardTests(unittest.TestCase):
+    def test_task_badges_follow_pending_urgency_and_clear_on_completion(self):
+        import re
+        app = AppTest.from_file(str(ROOT / "app.py")).run()
+
+        def card_for(name):
+            markup = "\n".join(item.proto.body for item in app.get("html"))
+            return next(card for card in re.findall(r'<article class="crew-summary">.*?</article>', markup) if f'<h3>{name}</h3>' in card)
+
+        self.assertIn('class="crew-status amber"', card_for("Alex"))
+        self.assertIn('class="crew-status red"', card_for("Petrov"))
+        self.assertIn('class="crew-status green"', card_for("Amara"))
+        app.button(key="complete_medical-check").click().run()
+        self.assertFalse(app.exception)
+        self.assertIn('class="crew-status green"', card_for("Petrov"))
+        self.assertIn('class="crew-status amber"', card_for("Alex"))
+
     def test_overview_has_five_channels_and_real_crew_csv_values(self):
         app = AppTest.from_file(str(ROOT / "app.py")).run()
         self.assertFalse(app.exception)

@@ -39,3 +39,7 @@ Edit `services/environment_colours.py` to change the display bands. Icons and mi
 | Missing values | Grey. |
 
 UV category boundaries follow the [EPA UV-index guide](https://www.epa.gov/sites/default/files/documents/uviguide.pdf). Red for High and above is a design choice. The oxygen concentration band references [OSHA's confined-space definitions](https://webapps.dol.gov/elaws/osha/confined/definitions.asp). These Earth-based bands are visual reference points, not validated spacecraft alarm limits or an EVA clearance. Temperature, outside-pressure and CO₂ colour bands are configurable display choices. In particular, the [NIOSH CO₂ 5,000 ppm limit](https://www.cdc.gov/niosh/npg/npgd0103.html) is a time-weighted exposure limit, not an instantaneous safety threshold; the dashboard does not compute exposure duration or certify air quality.
+
+## Task urgency colours
+
+Set `urgent: True` on an assignment in `services/dashboard.py` to make it urgent. Pending tasks use yellow outlines and due text; urgent tasks use red. Map connectors use the same colours. A crew badge is red if any pending task is urgent, yellow if pending tasks are all non-urgent, and green when there are no pending tasks. Completion recalculates these colours automatically. The colours are `--task-due` and `--task-urgent` in `frontend/dashboard.css` and `frontend/map/map.css`; changing the brand accent does not change task urgency colours.
