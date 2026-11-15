@@ -12,11 +12,11 @@ _map = declare_component(
 )
 
 
-def render_base_map(tasks=None):
+def render_base_map(tasks=None, background=None):
     """Return an area ID once per activation, or None when just exploring."""
     event = _map(
         tasks=tasks or [],
-        background=st.get_option("theme.backgroundColor") or "#111619",
+        background=background or st.get_option("theme.backgroundColor") or "#111619",
         areas=[
             {
                 "id": area_id,

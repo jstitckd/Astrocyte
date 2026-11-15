@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
 
 /* Main accent is passed from .streamlit/config.toml. Illustration colours stay here. */
 :root {
@@ -11,7 +11,7 @@
   --task-due: #ffd078;
   --task-urgent: #ff706b;
   color-scheme: dark;
-  font-family: "Rubik", Arial, sans-serif;
+  font-family: "IBM Plex Sans", Arial, sans-serif;
 }
 * {
   box-sizing: border-box;
@@ -86,16 +86,16 @@ button {
 .map-header-actions {display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex:none;}
 .task-count {border:1px solid currentColor;border-radius:8px;padding:7px 10px;color:var(--task-due);font-size:11px;white-space:nowrap;}
 .task-count.urgent {color:var(--task-urgent);}.task-count.clear {color:#72d7aa;}
-.task-marker {position:absolute;z-index:2;text-align:left;display:flex;flex-direction:column;gap:4px;border:1.5px solid var(--task-due);border-radius:12px;background:#1c2529f5;padding:11px 14px;color:#f2f1eb;box-shadow:0 8px 24px #0004;cursor:pointer;max-width:32%;}
-.task-marker strong {font-size:12px;}.task-marker span {font-size:10px;color:#c5cdce;}.task-marker small {font-size:11px;font-weight:700;color:var(--task-due);}
+.task-marker {position:absolute;z-index:2;text-align:left;display:flex;flex-direction:column;gap:4px;border:none;border-left:3px solid var(--task-due);border-radius:8px;background:#141b1ff5;padding:11px 14px;color:#f2f1eb;box-shadow:0 8px 24px #0004;cursor:pointer;max-width:32%;}
+.task-marker strong {font-size:12px;}.task-marker span {font-size:10px;color:#c5cdce;}.task-marker small {display:inline-flex;align-self:flex-start;margin-top:2px;padding:3px 6px;border-radius:4px;background:#ffd07818;font-size:9px;line-height:1.2;font-weight:600;color:var(--task-due);}
 .task-connectors {position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible;}
 .task-connector {fill:none;stroke:var(--task-due);stroke-width:1.5;stroke-linejoin:round;}
 .task-endpoint {fill:var(--task-due);stroke:#1b2327;stroke-width:1.5;}
 .task-connector.urgent {stroke:var(--task-urgent);}.task-endpoint.urgent {fill:var(--task-urgent);}
 .task-exercise {max-width:28%;}
-.task-marker:hover {background:#30323e;}
+.task-marker:hover {background:#1d272d;}
 .task-marker:focus-visible {outline:3px solid white;outline-offset:3px;}
-.task-marker.urgent {border-color:var(--task-urgent);}.task-marker.urgent small {color:var(--task-urgent);}
+.task-marker.urgent {border-left-color:var(--task-urgent);}.task-marker.urgent small {color:var(--task-urgent);background:#ff706b18;}
 .task-living {left:38%;top:6%;}.task-science {right:1%;top:7%;}.task-exercise {left:1%;top:69%;}
 .building.has-task .selection-pad {stroke:var(--accent);stroke-width:2;stroke-opacity:.9;fill-opacity:.12;}
 @media(max-width:600px) {.task-marker{padding:7px 8px;max-width:36%;border-radius:8px;}.task-marker strong{font-size:10px;}.task-marker span{display:none;}.task-marker small{font-size:9px;}.task-count{font-size:10px;}.task-living{left:24%;top:0;}.task-science{top:9%;}.task-exercise{top:70%;}.map-header h2{font-size:20px;}}

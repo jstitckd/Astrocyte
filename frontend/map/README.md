@@ -25,7 +25,7 @@ The main purple comes from `theme.primaryColor` in `.streamlit/config.toml`. The
 
 ## Interaction
 
-Task card positions are set by `.task-living`, `.task-science` and `.task-exercise` in `map.css`. Connector endpoints are explicit `circle.task-anchor` roof points inside those building groups in `index.html`; adjust their `cx`/`cy` to change the attachment point. `drawTaskConnectors()` in `map.js` draws the lines between the cards and those points as the map resizes. The exercise card is vertically aligned with its roof anchor automatically, making its connector horizontal; change its `left` value to move the card sideways.
+Task card positions are set by `.task-living`, `.task-science` and `.task-exercise` in `map.css`. Connector endpoints are explicit `circle.task-anchor` roof points inside those building groups in `index.html`; adjust their `cx`/`cy` to change the attachment point. `drawTaskConnectors()` in `map.js` draws the lines between the cards and those points as the map resizes. The first exercise card is vertically aligned with its roof anchor automatically, making its connector horizontal; change its `left` value to move the card sideways. Additional tasks for the same building stack below the first with separate connectors so the notifications remain readable.
 
 Hover or keyboard focus highlights a building. Clicking a building opens its page; Enter and Space also work. The Explore the outpost panel, guide list and detail card have been removed, and the illustration fills the available width.
 

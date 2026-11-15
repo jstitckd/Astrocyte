@@ -25,7 +25,7 @@ def render():
                 st.warning(f"Crew snapshot unavailable: {exc}")
         habitat, environment = st.columns([3.2, 1.1], gap="large")
         with habitat:
-            selected_area = render_base_map(tasks=tasks)
+            selected_area = render_base_map(tasks=tasks, background="#0b0f12")
             if selected_area:
                 st.session_state.page = selected_area
                 st.rerun()

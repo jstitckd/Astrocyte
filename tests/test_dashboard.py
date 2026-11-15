@@ -68,9 +68,28 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(app.session_state.page, "home")
         self.assertFalse(app.exception)
         self.assertEqual(len([button for button in app.button if button.key.startswith("complete_")]), 2)
-        for task in ("sleep-check", "exercise-check"):
+        for task in ("vo2max-test", "cognitive-test"):
             app.button(key=f"complete_{task}").click().run()
-        self.assertEqual(app.success[0].value, "All tasks completed.")
+        self.assertFalse(any(button.key.startswith("complete_") for button in app.button))
+        from models.astronauts import Astronauts
+        markup = "\n".join(item.proto.body for item in app.get("html"))
+        self.assertEqual(markup.count("All tasks completed."), len(Astronauts))
+
+    def test_milou_has_vo2_task_and_alex_has_no_sleep_assignment(self):
+        from services.dashboard import SAMPLE_TASKS
+        self.assertFalse(any(task["id"] == "sleep-check" for task in SAMPLE_TASKS))
+        task = next(task for task in SAMPLE_TASKS if task["id"] == "vo2max-test")
+        self.assertEqual(task["crew"], "Milou")
+        self.assertEqual(task["area"], "exercise")
+        app = AppTest.from_file(str(ROOT / "app.py")).run()
+        self.assertFalse(app.exception)
+        self.assertTrue(app.button(key="complete_vo2max-test"))
+        self.assertFalse(any(button.key == "complete_sleep-check" for button in app.button))
+        alex_tasks = [task for task in SAMPLE_TASKS if task["crew"] == "Alex"]
+        self.assertEqual([task["id"] for task in alex_tasks], ["cognitive-test"])
+        self.assertEqual(alex_tasks[0]["area"], "living")
+        self.assertTrue(app.button(key="complete_cognitive-test"))
+        self.assertFalse(any(button.key == "complete_exercise-check" for button in app.button))
 
     def test_each_map_task_opens_its_guide_and_back_does_not_replay(self):
         from services.dashboard import SAMPLE_TASKS

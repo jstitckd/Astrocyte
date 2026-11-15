@@ -19,6 +19,7 @@
       Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
       overlay.append(element);
     };
+    const previousByArea = new Map();
     document.querySelectorAll(".task-marker").forEach(marker => {
       const building = buildings.find(item => item.dataset.area === marker.dataset.area);
       const anchor = building?.querySelector(".task-anchor");
@@ -27,13 +28,20 @@
       const point = new DOMPoint(anchor.cx.baseVal.value, anchor.cy.baseVal.value).matrixTransform(matrix);
       const end = {x: point.x - bounds.left, y: point.y - bounds.top};
       const horizontal = marker.dataset.area === "exercise";
-      if (horizontal) marker.style.top = `${end.y - marker.offsetHeight / 2}px`;
+      const previous = previousByArea.get(marker.dataset.area);
+      if (previous) {
+        marker.style.top = `${previous.bottom - bounds.top + 8}px`;
+      } else if (horizontal) {
+        marker.style.top = `${end.y - marker.offsetHeight / 2}px`;
+      }
       const card = marker.getBoundingClientRect();
+      previousByArea.set(marker.dataset.area, card);
       const start = horizontal
         ? {x: card.right - bounds.left, y: card.top + card.height / 2 - bounds.top}
         : {x: card.left + card.width / 2 - bounds.left, y: card.bottom - bounds.top};
       const middleY = (start.y + end.y) / 2;
-      const path = horizontal ? `M${start.x},${start.y} L${end.x},${end.y}`
+      const path = horizontal && previous ? `M${start.x},${start.y} H${(start.x + end.x) / 2} V${end.y} H${end.x}`
+        : horizontal ? `M${start.x},${start.y} L${end.x},${end.y}`
         : `M${start.x},${start.y} V${middleY} H${end.x} V${end.y}`;
       const urgent = marker.classList.contains("urgent") ? " urgent" : "";
       svgElement("path", {class: "task-connector" + urgent, d: path});

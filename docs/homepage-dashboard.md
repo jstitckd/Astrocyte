@@ -6,6 +6,7 @@ Run `.venv/bin/python -m streamlit run app.py` from the Astrocyte folder.
 | --- | --- |
 | Main layout and task list | `views/home.py` |
 | Reading cards and crew summary markup | `components/dashboard.py` |
+| Environmental gauge rendering and bands | `components/environment_gauge.py`, `services/environment_colours.py` |
 | Card spacing, colours, sizes and mobile layout | `frontend/dashboard.css` |
 | CSV snapshot loading and sample assignments | `services/dashboard.py` |
 | Cabin demo formulas and optional CSV channels | `services/environment.py` |
@@ -17,7 +18,7 @@ Dashboard outside temperature, pressure and UV come from `data/mars_diurnal_weat
 
 Cabin O₂ and CO₂ retain the existing synthetic `testing.py` scenario (Sol 1740); the new CSV has no cabin gas channels. These are snapshots, not a live sensor connection. Cached snapshots refresh on a subsequent page run after 30 seconds. To select another observation, change the `time` argument passed to `weather_snapshot()` in `services/dashboard.py`. The detailed legacy environmental component remains separate; see `docs/environment.md`.
 
-Environment cards with multiple recorded samples include a tiny SVG image styled with a purple line, faded area and selected-time dot. Temperature, pressure and UV use the hourly CSV profile; missing samples remain gaps. Cabin gases have no graph, since they have no measured history. Cards are ordered radiation/UV, outside temperature, outside pressure, cabin O₂, then cabin CO₂. Hover over a graph for its series description and selected time. Each chart scales independently. Edit the drawing in `components/environment_sparkline.py` and its size in `frontend/dashboard.css` (`.env-sparkline`).
+The shared environmental card uses slim horizontal gauges, with no icons or history graphs. Each gauge displays a smooth green–yellow–red gradient, the measured value, a marker, status text and scale endpoints. UV and CO₂ run from green at lower values toward red at higher values. Outside temperature, outside pressure and cabin O₂ are green across their preferred middle display band, fading through yellow toward red at either extreme. Cards remain ordered radiation/UV, outside temperature, outside pressure, cabin O₂, then cabin CO₂. Edit the rendering in `components/environment_gauge.py`, styling in `frontend/dashboard.css` (`.env-gauge`), and scale settings in `services/environment_colours.py` (`GAUGE_SCALES`). Missing readings have no marker. Values outside the visible scale pin the marker to the endpoint while retaining the actual numeric reading; UV's upper scale is labelled **12+**.
 
 Crew summaries read the latest rows of `data/alex.csv`, `data/petrov.csv` and their corresponding `_30days.csv` files. The ring is the CSV's sleep score, not a calculated overall health score. All current crew files are synthetic. Heart rate and SpO₂ are the latest daily measurements; HRV and sleep score are the latest recovery record.
 
@@ -25,15 +26,15 @@ Sample tasks are assigned to a crew member and habitat area in `SAMPLE_TASKS`. A
 
 Building clicks still open the existing habitat pages. The crew summary buttons open Alex and Petrov's existing pages. The map stays unboxed, with the environment readings in a column on its right.
 
-## Environmental icon colours
+## Environmental gauge bands
 
-Edit `services/environment_colours.py` to change the display bands. Icons and mini graphs use the same colour. Hover over a card for the category; screen readers receive the same description.
+Edit `GAUGE_SCALES` in `services/environment_colours.py` to change each gauge’s minimum, low/normal/high boundaries, maximum, labels and colours. The bar is a continuous gradient; status text retains a discrete band colour. Gauges expose their range, actual value and status to screen readers.
 
 | Channel | Display colours |
 | --- | --- |
 | UV index | Green below 3; amber from 3 to below 6; red from 6 upward, retaining High / Very high / Extreme text categories. |
-| Outside temperature | Blue below freezing; amber at or above freezing. |
-| Outside pressure | Amber below 1,000 Pa; blue otherwise. This describes outside pressure, not cabin pressure. |
+| Outside temperature | Normal Mars display band from −60 to −20 °C is green; the gradient fades through yellow toward red on both sides. Scale: −100 to 20 °C. |
+| Outside pressure | Normal Mars display band from 500 to 600 Pa is green; the gradient fades through yellow toward red on both sides. Scale: 350–800 Pa. Outside conditions are not cabin pressure or a breathability indicator. |
 | Cabin O₂ | Green from 19.5–23.5%; red outside that range. |
 | Cabin CO₂ | Green below 1,000 ppm; amber from 1,000 to below 5,000; red from 5,000. |
 | Missing values | Grey. |

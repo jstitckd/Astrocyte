@@ -1,6 +1,29 @@
 """Editable learning content for the habitat's sample crew assignments."""
 
 TASK_GUIDES = {
+    "cognitive-test": {
+        "goal": "Complete Alex's assigned psychomotor vigilance test (PVT) and record the reported reaction time.",
+        "equipment": "The assigned PVT application or device and a quiet workspace.",
+        "steps": (
+            ("Prepare your workspace", "Sit comfortably at a quiet workstation in the living and working quarters. Use the same device and input method used for your previous tests."),
+            ("Check the assigned protocol", "Confirm your name, the test date and trial number. Read the application's instructions and complete its practice block if provided."),
+            ("Complete the test", "Respond to each stimulus as instructed by the application. Finish the full assigned session without pausing or switching to other tasks."),
+            ("Record the reported result", "Record the application's median reaction time in milliseconds, with the test date and trial number. Note interruptions or device problems instead of treating an interrupted test as a routine result."),
+            ("Review and complete", "Review the result with the assigned reviewer. On Alex's health page, Log a test includes Psychomotor vigilance · reaction time; its demonstration form does not modify the dataset. Mark this task complete after the test and review."),
+        ),
+    },
+    "vo2max-test": {
+        "goal": "Complete Milou's assigned aerobic fitness assessment and record the result for review.",
+        "equipment": "Mission-approved exercise equipment, monitoring equipment and the assigned test protocol.",
+        "steps": (
+            ("Confirm the test method", "Check the assessment assigned by the mission medical officer. A supervised oxygen-consumption test and a wearable VO₂ max estimate are different methods; record which one you use."),
+            ("Prepare with the test operator", "For a supervised test, let the trained operator set up the exercise equipment, breathing mask and monitoring sensors. Follow the assigned preparation instructions."),
+            ("Follow the approved assessment", "Follow the operator's workload and recovery instructions. Do not turn a routine wearable estimate into an unsupervised maximal-effort test."),
+            ("Record the result", "Record the reported VO₂ value in mL/kg/min, the observation date, test number and method. Keep a device estimate labelled as an estimate."),
+            ("Review and complete", "Review the result with the assigned reviewer. Milou's health page includes a VO₂ max estimate option in Log a test; that form is a demonstration and does not change the dataset. Mark this assignment complete after the assessment and review."),
+        ),
+        "source": ("American Thoracic Society: cardiopulmonary exercise testing", "https://site.thoracic.org/advocacy-patients/patient-resources/cardiopulmonary-exercise-testing-cpet"),
+    },
     "sleep-check": {
         "goal": "Review your overnight measurements and prepare a useful sleep report.",
         "equipment": "Your overnight wearable record and mission sleep log.",

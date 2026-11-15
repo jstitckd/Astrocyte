@@ -10,9 +10,9 @@ from services.crew_health import health_score
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_TASKS = (
-    {"id": "sleep-check", "crew": "Alex", "area": "living", "title": "Sleep check", "detail": "Review overnight heart rate", "due": "10:00", "urgent": False},
     {"id": "medical-check", "crew": "Petrov", "area": "science", "title": "Medical check", "detail": "Record blood pressure measurement", "due": "Now", "urgent": True},
-    {"id": "exercise-check", "crew": "Alex", "area": "exercise", "title": "Exercise check", "detail": "Review post-workout recovery", "due": "11:30", "urgent": False},
+    {"id": "cognitive-test", "crew": "Alex", "area": "living", "title": "Cognitive test", "detail": "Complete the psychomotor vigilance test", "due": "11:30", "urgent": False},
+    {"id": "vo2max-test", "crew": "Milou", "area": "exercise", "title": "VO₂ max test", "detail": "Complete the assigned aerobic fitness assessment", "due": "Today", "urgent": False},
 )
 
 

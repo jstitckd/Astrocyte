@@ -45,12 +45,10 @@ class DashboardWeatherTests(unittest.TestCase):
         self.assertIn("-32.0 <span>°C</span>", markup)
         self.assertIn("51 <span>UV index</span>", markup)
         self.assertNotIn("µSv/h", markup)
-        self.assertEqual(markup.count('class="env-sparkline"'), 3)
-        import base64
-        import re
-        charts = "".join(base64.b64decode(encoded).decode() for encoded in re.findall(r'data:image/svg\+xml;base64,([^"\s]+)', markup))
-        self.assertEqual(charts.count('class="env-spark-line"'), 3)
-        self.assertNotIn('>Snapshot only</text>', charts)
+        self.assertEqual(markup.count('class="env-gauge"'), 5)
+        self.assertEqual(markup.count('role="meter"'), 5)
+        self.assertNotIn('class="env-sparkline"', markup)
+        self.assertNotIn('class="dash-icon"', markup)
         labels = ("Radiation · UV", "Outside temperature", "Outside pressure", "Cabin O₂", "Cabin CO₂")
         positions = [markup.index(label) for label in labels]
         self.assertEqual(positions, sorted(positions))

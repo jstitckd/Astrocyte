@@ -1,12 +1,10 @@
 """Compact homepage cards. Layout styles live in frontend/dashboard.css."""
 from html import escape
-import base64
 
 import streamlit as st
 from services.dashboard import complete_task
 from services.crew_health import score_colour
-from components.environment_sparkline import sparkline
-from components.environment_icons import environment_icon
+from components.environment_gauge import gauge
 from services.environment_colours import environment_colour
 
 
@@ -16,18 +14,12 @@ def environmental_cards(snapshot):
     for key, label, digits in channels:
         reading = snapshot.readings[key]
         colour, status = environment_colour(key, reading.value)
-        icon = environment_icon(key, colour)
         value = "—" if reading.value is None else f"{reading.value:,.{digits}f}"
-        source = {"demo": "", "csv": "Recorded", "missing": "Not measured"}[reading.source]
+        source = {"demo": "", "csv": "", "missing": "Not measured"}[reading.source]
         source_label = f"<small>{source}</small>" if source else ""
-        chart = ""
-        if sum(value is not None for _, value in snapshot.history[key]) > 1:
-            svg = sparkline(snapshot.history[key], snapshot.time, label, reading.unit, key, colour)
-            encoded = base64.b64encode(svg.encode()).decode("ascii")
-            description = f"{label}: hourly CSV profile; selected {snapshot.time}"
-            chart = f'<img class="env-sparkline" alt="{escape(description, quote=True)}" title="{escape(description, quote=True)}" src="data:image/svg+xml;base64,{encoded}">'
+        indicator = gauge(key, reading.value, reading.unit, status)
         description = escape(f"{label}: {value} {reading.unit}. {status}", quote=True)
-        cards.append(f'<article class="dash-metric" title="{escape(status, quote=True)}" aria-label="{description}"><div class="dash-metric-top">{icon}{label}{source_label}</div><div class="dash-reading-row"><div class="dash-number">{value} <span>{escape(reading.unit)}</span></div>{chart}</div></article>')
+        cards.append(f'<article class="dash-metric" title="{escape(status, quote=True)}" aria-label="{description}"><div class="dash-metric-top">{label}{source_label}</div><div class="dash-reading-row"><div class="dash-number">{value} <span>{escape(reading.unit)}</span></div><span class="env-gauge-status" style="color:{colour}">{escape(status)}</span></div>{indicator}</article>')
     st.html('<section class="dash-metrics" aria-label="Environmental and cabin readings">' + ''.join(cards) + '</section>')
 
 
@@ -44,7 +36,12 @@ def crew_card(crew, tasks):
     with st.container(border=True, key=f"crew_card_{name}"):
         st.html(f'''<article class="crew-summary"><div class="crew-top"><h3>{name}</h3><span class="crew-status {tone}">{status}</span></div><div class="crew-health-row">{gauge}<div class="crew-compact-vitals"><span>Sleep score <b>{crew['sleep_score']}/100</b></span><span>Heart rate <b>{crew['hr']} bpm</b></span><span>SpO₂ <b>{crew['spo2']:.0f}%</b></span><span>HRV <b>{crew['hrv']:.0f} ms</b></span></div></div></article>''')
         if not assigned:
-            st.success("All tasks completed.")
+            with st.container(border=True, key=f"crew_task_done_{name}"):
+                label, action = st.columns([5, 1], gap="small", vertical_alignment="center")
+                with label:
+                    st.html('<div class="crew-task-line crew-task-complete">All tasks completed.</div>')
+                with action:
+                    st.html('<span class="crew-task-done-check" aria-hidden="true">✓</span>')
         for task in assigned:
             selected = st.session_state.get("selected_habitat_task") == task["id"]
             prefix = "task_selected" if selected else "crew_task"

@@ -24,8 +24,9 @@ class ProfileControlTests(unittest.TestCase):
                 self.assertFalse(app.exception)
                 markup = "\n".join(item.value for item in app.markdown)
                 self.assertIn(f'class="dlg-title">{astronaut.name}</div>', markup)
-                self.assertIn("Telemetry insights", markup)
-                self.assertIn("Flight surgeon actions", markup)
+                self.assertIn('class="dlg-list"', markup)
+                self.assertIn("Overnight HRV", markup)
+                self.assertIn('class="dlg-list rec"', markup)
 
     def test_catalogue_covers_recorded_measurements_not_derived_fields(self):
         for name in Astronauts:
