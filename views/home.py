@@ -18,7 +18,7 @@ def render():
             try:
                 members = crew_snapshots()
                 if members:
-                    for column, member in zip(st.columns(len(members), gap="medium"), members):
+                    for column, member in zip(st.columns(len(members), gap="small"), members):
                         with column:
                             crew_card(member, tasks)
             except (OSError, KeyError, ValueError) as exc:

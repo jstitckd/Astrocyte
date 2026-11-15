@@ -8,7 +8,7 @@
 .st-key-crew_overview .crew-body {flex-wrap:nowrap;}
 .st-key-crew_overview .crew-vitals {flex:1;}
 .st-key-crew_overview .crew-vitals span {display:flex;justify-content:space-between;gap:12px;}
-.st-key-crew_overview [class*="st-key-crew_card_"] {background:linear-gradient(130deg,#1c2529,#182024);border-color:var(--dash-line);border-radius:13px;}
+.st-key-crew_overview [class*="st-key-crew_card_"] {background:linear-gradient(130deg,#1c2529,#182024);border:none;border-radius:13px;}
 .st-key-crew_overview .crew-summary {background:transparent;border:0;padding:0;margin:0;}
 .st-key-crew_overview [class*="st-key-task_selected_"] {border-color:var(--brand-accent);background:#d093f610;}
 .st-key-crew_overview [class*="st-key-crew_card_"] {padding:10px 12px;border-radius:10px;}
@@ -38,8 +38,8 @@
 .st-key-crew_overview [class*="st-key-summary_"] {position:absolute;inset:0;width:100%;height:100%;z-index:1;}
 .st-key-crew_overview [class*="st-key-summary_"] [data-testid="stButton"] {height:100%;}
 .st-key-crew_overview [class*="st-key-summary_"] button {width:100%;height:100%;opacity:0;cursor:pointer;}
-.st-key-crew_overview [class*="st-key-crew_card_"]:has([class*="st-key-summary_"] button:hover),
-.st-key-crew_overview [class*="st-key-crew_card_"]:has([class*="st-key-summary_"] button:focus-visible) {border-color:var(--brand-accent);box-shadow:0 0 0 1px var(--brand-accent);}
+.st-key-crew_overview [class*="st-key-crew_card_"]:has([class*="st-key-summary_"] button:hover) {background:#222d31;}
+.st-key-crew_overview [class*="st-key-crew_card_"]:has([class*="st-key-summary_"] button:focus-visible) {outline:2px solid var(--brand-accent);outline-offset:2px;}
 .st-key-crew_overview [class*="st-key-crew_task_"], .st-key-crew_overview [class*="st-key-task_selected_"] {position:relative;z-index:2;cursor:default;}
 .dash-metric {background:linear-gradient(120deg,#1c2529,#192126);border:1px solid var(--dash-line);border-radius:12px;padding:15px 16px;min-width:0;}
 .dash-metric-top {display:flex;align-items:center;gap:8px;font-size:13px;white-space:nowrap;}
