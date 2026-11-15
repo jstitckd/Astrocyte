@@ -12,20 +12,19 @@ from services.astronaut_tools import profile_data, profile_insights, test_catalo
 
 DIALOG_THEME_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap');
 
-div[data-testid="stDialog"] div[role="dialog"] {
-    background: linear-gradient(180deg, #12161B 0%, #0C0E10 100%) !important;
+div[data-testid="stDialog"] [role="dialog"] {
+    background: var(--page-background) !important;
     border: 1px solid #20262B !important;
     border-radius: 22px !important;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.75) !important;
     color: #F2F4F5 !important;
-    font-family: 'Barlow', sans-serif !important;
+    font-family: 'IBM Plex Sans', sans-serif !important;
     font-variant-numeric: tabular-nums;
 }
 
-div[data-testid="stDialog"] div[role="dialog"] h2 {
-    font-family: 'Barlow Condensed', sans-serif !important;
+div[data-testid="stDialog"] [role="dialog"] h2 {
+    font-family: 'IBM Plex Sans', sans-serif !important;
     letter-spacing: 0.02em;
     color: #F2F4F5 !important;
 }
@@ -50,7 +49,7 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
     margin-bottom: 2px;
 }
 .dlg-title {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 28px;
     font-weight: 600;
     color: #F2F4F5;
@@ -73,7 +72,7 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
     .dlg-kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .dlg-kpi-card {
-    background: #14171A;
+    background: var(--surface-card);
     border: 1px solid #20262B;
     border-radius: 16px;
     padding: 14px 16px;
@@ -85,14 +84,14 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
     margin-bottom: 6px;
 }
 .dlg-kpi-val {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 32px;
     font-weight: 600;
     line-height: 1.05;
     color: #F2F4F5;
 }
 .dlg-kpi-unit {
-    font-family: 'Barlow', sans-serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 14px;
     font-weight: 400;
     color: #6E7A83;
@@ -104,7 +103,7 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    background: #14171A;
+    background: var(--surface-card);
     border: 1px solid #20262B;
     border-radius: 16px;
     padding: 14px 16px;
@@ -121,7 +120,7 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
     margin-bottom: 6px;
 }
 .dlg-pillar-top strong {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 16px;
     color: #F2F4F5;
 }
@@ -147,13 +146,13 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
     .dlg-panel-grid { grid-template-columns: 1fr; }
 }
 .dlg-panel {
-    background: #14171A;
+    background: var(--surface-card);
     border: 1px solid #20262B;
     border-radius: 16px;
     padding: 16px;
 }
 .dlg-panel-title {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.03em;
@@ -199,7 +198,7 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
 
 /* Test instructions */
 .dlg-instr {
-    background: #14171A;
+    background: var(--surface-card);
     border: 1px solid #20262B;
     border-radius: 12px;
     padding: 14px 16px;
@@ -232,14 +231,14 @@ div[data-testid="stDialog"] div[role="dialog"] h2 {
 
 /* Style Streamlit form & inputs inside the dialog */
 div[data-testid="stDialog"] [data-testid="stForm"] {
-    background: #14171A !important;
+    background: var(--surface-card) !important;
     border: 1px solid #20262B !important;
     border-radius: 16px !important;
     padding: 18px !important;
 }
 div[data-testid="stDialog"] input,
 div[data-testid="stDialog"] div[data-baseweb="select"] > div {
-    background-color: #0C0E10 !important;
+    background-color: #0b0f12 !important;
     border-color: #2A3138 !important;
     border-radius: 10px !important;
     color: #F2F4F5 !important;

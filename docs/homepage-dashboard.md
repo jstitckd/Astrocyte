@@ -44,3 +44,7 @@ UV category boundaries follow the [EPA UV-index guide](https://www.epa.gov/sites
 ## Task urgency colours
 
 Set `urgent: True` on an assignment in `services/dashboard.py` to make it urgent. Pending tasks use yellow outlines and due text; urgent tasks use red. Map connectors use the same colours. A crew badge is red if any pending task is urgent, yellow if pending tasks are all non-urgent, and green when there are no pending tasks. Completion recalculates these colours automatically. The colours are `--task-due` and `--task-urgent` in `frontend/dashboard.css` and `frontend/map/map.css`; changing the brand accent does not change task urgency colours.
+
+## Shared website appearance
+
+All pages use IBM Plex Sans and the dashboard’s appearance. `frontend/styles.css` defines `--app-font`, `--page-background` (`#0b0f12`) and `--surface-card` (a `#141b1f` to `#11171b` gradient). Astronaut chart cards, headers, task-guide steps and popup panels use these same surfaces; profile charts also specify IBM Plex Sans in their Plotly labels. The map iframe loads its font independently in `frontend/map/map.css`. `.streamlit/config.toml` matches the shared main background.

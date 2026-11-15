@@ -91,7 +91,7 @@ The seven destination pages intentionally contain no sample widgets or placehold
 | `components/sidebar.py` | Shared logo and working navigation. Put future reusable widgets under `components/`. |
 | `models/areas.py` | `HABITAT_AREAS`: seven map destinations, labels, descriptions and facilities. Original `AREAS` remains for older pages. |
 | `models/metrics.py` | Empty metric dictionary for the team to define later. |
-| `frontend/styles.css` | Minimal styling for the shared shell. |
+| `frontend/styles.css` | Shared IBM Plex Sans font, page background, card surfaces and shell styling. |
 | `frontend/map/` | Editable map drawing (`index.html`), colours (`map.css`) and interactions (`map.js`). |
 | `components/base_map.py` | Embeds the map and validates building selections. |
 | `components/dashboard.py` | Homepage cabin cards and crew summaries. |

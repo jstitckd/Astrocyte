@@ -1,7 +1,35 @@
-/* Shared shell only. Add your team's page styling here. */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
+/* Shared appearance for every page, including profile dialogs. */
 :root {
   --brand-accent: #d093f6;
   --brand-ink: #291735;
+  --app-font: "IBM Plex Sans", Arial, sans-serif;
+  --page-background: #0b0f12;
+  --surface-card: linear-gradient(130deg, #141b1f, #11171b);
+  --surface-raised: #1d272d;
+}
+
+html body,
+html body *:not([class*="material-symbols"]):not([data-testid="stIconMaterial"]) {
+  font-family: var(--app-font) !important;
+}
+
+html body,
+html body [data-testid="stAppViewContainer"],
+html body [data-testid="stMain"],
+html body [data-testid="stHeader"] {
+  background: var(--page-background) !important;
+}
+
+[class*="st-key-astronaut_header_"],
+[class*="st-key-taskguide_"] {
+  background: var(--surface-card);
+}
+
+[class*="st-key-astronaut_header_"] {
+  border: none;
+  box-shadow: none;
 }
 
 .block-container {

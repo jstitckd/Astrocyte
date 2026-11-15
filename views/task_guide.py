@@ -1,7 +1,6 @@
 """Learning page opened by a habitat task notification."""
 import streamlit as st
 
-from models.areas import HABITAT_AREAS
 from models.task_guides import TASK_GUIDES
 from services.dashboard import SAMPLE_TASKS, complete_task
 
@@ -26,14 +25,11 @@ def render():
         return
 
     st.title(task["title"])
-    st.caption(f"Assigned to {task['crew']} · {HABITAT_AREAS[task['area']].label} · Due {task['due']}")
-    st.markdown(guide["goal"])
-    st.caption("Training guide · use your mission procedures and approved device instructions.")
-    with st.container(border=True):
+    with st.container(border=True, key="taskguide_preparation"):
         st.markdown("**Before you begin**")
         st.write(guide["equipment"])
-    for number, (title, instructions) in enumerate(guide["steps"], 1):
-        with st.container(border=True):
+    with st.container(border=True, key="taskguide_steps"):
+        for number, (title, instructions) in enumerate(guide["steps"], 1):
             st.markdown(f"**{number}. {title}**")
             st.write(instructions)
     if guide.get("source"):

@@ -26,7 +26,7 @@ def render_astronaut_header(
     flag_url = f"https://flagcdn.com/w40/{country_code.lower()}.png"
 
     header_html = f"""
-    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px; padding: 4px 0; font-family: sans-serif;">
+    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px; padding: 4px 0; font-family: 'IBM Plex Sans', sans-serif;">
         <!-- 1. Name, Flag & Demographics -->
         <div>
             <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #888888; margin-bottom: 4px;">
@@ -79,7 +79,7 @@ def render_astronaut_header(
         with actions:
             render_header_actions("Amara", health_score)
 
-def graphs():
+def graphs(render_header=None):
     # ---------------------------------------------------------------------------
     # PAGE CONFIG & GLOBAL STYLES
     # ---------------------------------------------------------------------------
@@ -91,11 +91,10 @@ def graphs():
 
     CUSTOM_CSS = """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Barlow:wght@400;500;600&display=swap');
 
     :root {
-        --bg-page: #0C0E10;
-        --bg-card: #14171A;
+        --bg-page: #0b0f12;
+        --bg-card: #141b1f;
         --divider: #20262B;
         --text-primary: #F2F4F5;
         --text-secondary: #9AA5AD;
@@ -105,13 +104,9 @@ def graphs():
     }
 
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-        background:
-            radial-gradient(ellipse 85% 45% at 50% -8%, rgba(61, 220, 132, 0.085) 0%, rgba(12, 14, 16, 0) 68%),
-            radial-gradient(ellipse 65% 40% at 88% 18%, rgba(111, 211, 255, 0.055) 0%, rgba(12, 14, 16, 0) 60%),
-            linear-gradient(180deg, #101418 0%, #0C0E10 42%, #080A0C 100%) !important;
-        background-attachment: fixed !important;
+        background: var(--page-background) !important;
         color: var(--text-primary);
-        font-family: 'Barlow', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-variant-numeric: tabular-nums;
     }
 
@@ -127,7 +122,7 @@ def graphs():
 
     /* Section titles */
     .section-title {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 22px;
         font-weight: 600;
         color: var(--text-primary);
@@ -135,7 +130,7 @@ def graphs():
         letter-spacing: 0.01em;
     }
     .section-sub {
-        font-family: 'Barlow', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 13px;
         font-weight: 400;
         color: var(--text-muted);
@@ -162,7 +157,7 @@ def graphs():
     /* Tile card container (keyed containers + legacy selector) */
     [class*="st-key-tile"], [class*="st-key-hero"],
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: var(--bg-card) !important;
+        background: var(--surface-card) !important;
         border-radius: 22px !important;
         padding: 20px !important;
         border: none !important;
@@ -230,7 +225,7 @@ def graphs():
         left: 0;
         top: 24px;
         width: 245px;
-        background: #0C0E10;
+        background: #0b0f12;
         border: 1px solid #2A3138;
         border-radius: 12px;
         padding: 10px 12px;
@@ -287,7 +282,7 @@ def graphs():
         margin-bottom: 10px;
     }
     .metric-value {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 44px;
         font-weight: 600;
         color: var(--text-primary);
@@ -350,7 +345,7 @@ def graphs():
         pointer-events: none;
     }
     .hero-score-num {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 54px;
         font-weight: 600;
         line-height: 1.0;
@@ -377,7 +372,7 @@ def graphs():
     .pillar-box { display: flex; flex-direction: column; gap: 2px; }
     .pillar-name { font-size: 12px; color: var(--text-secondary); }
     .pillar-val {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 24px;
         font-weight: 600;
         color: var(--text-primary);
@@ -700,13 +695,13 @@ def graphs():
             hovermode="closest",
             hoverdistance=40,
             hoverlabel=dict(
-                bgcolor="#0C0E10", bordercolor="#20262B",
-                font=dict(family="Barlow, sans-serif", size=12, color="#F2F4F5"),
+                bgcolor="#0b0f12", bordercolor="#20262B",
+                font=dict(family="IBM Plex Sans, sans-serif", size=12, color="#F2F4F5"),
             ),
             xaxis=dict(
                 range=padded_x_range, tickmode="array", tickvals=tick_vals, ticktext=tick_text,
                 showgrid=False, zeroline=False, showline=False, fixedrange=True,
-                tickfont=dict(family="Barlow, sans-serif", size=11, color="#6E7A83"),
+                tickfont=dict(family="IBM Plex Sans, sans-serif", size=11, color="#6E7A83"),
             ),
             yaxis=dict(range=[y_floor, y_ceil], visible=False, showgrid=False, zeroline=False, fixedrange=True),
         )
@@ -771,6 +766,8 @@ def graphs():
 
     health_summary = compute_composite_index(df_day, df_30d, df_test, df_extra)
     st.session_state["health_summary_Amara"] = health_summary
+    if render_header is not None:
+        render_header(round(health_summary["overall"] / 10.0, 1))
     render_circular_hero(health_summary)
 
     # --- Section 1: live telemetry ---------------------------------------------
@@ -892,15 +889,15 @@ def graphs():
     @media (max-width: 900px) { .cy-grid { grid-template-columns: repeat(6, 1fr); } }
     @media (max-width: 520px) { .cy-grid { grid-template-columns: repeat(4, 1fr); } }
     .cy-cell {
-        background: #0F1215; border-radius: 12px; border-top: 3px solid var(--ph);
+        background: var(--surface-card); border-radius: 12px; border-top: 3px solid var(--ph);
         padding: 8px 9px 7px 9px; display: flex; flex-direction: column; gap: 1px; min-width: 0;
         transition: transform 0.12s ease, background 0.12s ease; cursor: default;
     }
-    .cy-cell:hover { background: #181C20; transform: translateY(-2px); }
-    .cy-cell.cy-today { outline: 1.5px solid #F2F4F5; outline-offset: -1px; background: #181C20; }
+    .cy-cell:hover { background: #192328; transform: translateY(-2px); }
+    .cy-cell.cy-today { outline: 1.5px solid #F2F4F5; outline-offset: -1px; background: #192328; }
     .cy-date { font-size: 11px; color: var(--text-muted); }
-    .cy-day { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 600; color: var(--text-primary); line-height: 1.1; }
-    .cy-day small { font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 400; color: var(--text-muted); margin-right: 1px; }
+    .cy-day { font-family: 'IBM Plex Sans', sans-serif; font-size: 22px; font-weight: 600; color: var(--text-primary); line-height: 1.1; }
+    .cy-day small { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 400; color: var(--text-muted); margin-right: 1px; }
     .cy-marks { display: flex; align-items: center; gap: 3px; height: 10px; margin-top: 4px; }
     .cy-flow { width: 6px; height: 6px; border-radius: 50%; background: #FF5A4D; display: inline-block; }
     .cy-lh { width: 7px; height: 7px; background: #FFC857; transform: rotate(45deg); box-sizing: border-box; display: inline-block; margin: 0 2px; }
@@ -1094,7 +1091,7 @@ def graphs():
         fig_bbt.add_vrect(x0=a - 0.5, x1=b + 0.5, fillcolor=hex_to_rgba(p_col, 0.09), layer="below", line_width=0)
         fig_bbt.add_annotation(
             x=(a + b) / 2, y=1.0, yref="paper", yanchor="bottom", showarrow=False, text=p_name.upper(),
-            font=dict(family="Barlow, sans-serif", size=10, color=p_col),
+            font=dict(family="IBM Plex Sans, sans-serif", size=10, color=p_col),
         )
 
     # new-cycle divider
@@ -1107,7 +1104,7 @@ def graphs():
         fig_bbt.add_hline(
             y=coverline, line=dict(color=hex_to_rgba(ACCENTS["amber"], 0.55), width=1, dash="dash"), layer="below",
             annotation_text="Coverline", annotation_position="top left",
-            annotation_font=dict(family="Barlow, sans-serif", size=10, color=hex_to_rgba(ACCENTS["amber"], 0.85)),
+            annotation_font=dict(family="IBM Plex Sans, sans-serif", size=10, color=hex_to_rgba(ACCENTS["amber"], 0.85)),
         )
 
     # temperature line with gradient fill
@@ -1131,7 +1128,7 @@ def graphs():
     fig_bbt.add_trace(
         go.Scatter(
             x=df_cy["idx"], y=temps, mode="markers", showlegend=False,
-            marker=dict(size=7, color=[phase_info(str(p))[1] for p in df_cy["cycle_phase"]], line=dict(color="#14171A", width=1.5)),
+            marker=dict(size=7, color=[phase_info(str(p))[1] for p in df_cy["cycle_phase"]], line=dict(color="#141b1f", width=1.5)),
             customdata=[[r.date_short, int(r.cycle_day), phase_info(str(r.cycle_phase))[0]] for r in df_cy.itertuples()],
             hovertemplate="%{customdata[0]} · cycle day %{customdata[1]}<br>%{customdata[2]} · %{y:.2f} °C<extra></extra>",
         )
@@ -1181,18 +1178,18 @@ def graphs():
         margin=dict(l=8, r=8, t=26, b=64),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         hovermode="closest", hoverdistance=40,
-        hoverlabel=dict(bgcolor="#0C0E10", bordercolor="#20262B", font=dict(family="Barlow, sans-serif", size=12, color="#F2F4F5")),
+        hoverlabel=dict(bgcolor="#0b0f12", bordercolor="#20262B", font=dict(family="IBM Plex Sans, sans-serif", size=12, color="#F2F4F5")),
         showlegend=True,
-        legend=dict(orientation="h", x=0, y=-0.17, yanchor="top", font=dict(family="Barlow, sans-serif", size=11, color="#9AA5AD")),
+        legend=dict(orientation="h", x=0, y=-0.17, yanchor="top", font=dict(family="IBM Plex Sans, sans-serif", size=11, color="#9AA5AD")),
         xaxis=dict(
             range=[-0.8, n_cy - 0.2], tickmode="array", tickvals=cy_ticks, ticktext=cy_tick_text,
             showgrid=False, zeroline=False, showline=False, fixedrange=True,
-            tickfont=dict(family="Barlow, sans-serif", size=11, color="#6E7A83"),
+            tickfont=dict(family="IBM Plex Sans, sans-serif", size=11, color="#6E7A83"),
         ),
         yaxis=dict(
             range=[y_floor_c, y_ceil_c], tickmode="array", tickvals=y_ticks, tickformat=".1f",
             showgrid=True, gridcolor="#20262B", gridwidth=1, zeroline=False, showline=False, fixedrange=True,
-            tickfont=dict(family="Barlow, sans-serif", size=11, color="#6E7A83"),
+            tickfont=dict(family="IBM Plex Sans, sans-serif", size=11, color="#6E7A83"),
         ),
     )
 
@@ -1605,14 +1602,8 @@ def graphs():
     return round(health_summary["overall"] / 10.0, 1)
 # --- Render amara's Header ---
 def render():
-    # 1. Reserve the top spot on the page first
-    header_slot = st.empty()
-
-    # 2. Run graphs() and get the calculated score
-    calculated_score = graphs()
-
-    # 3. Render the header back into the reserved top spot
-    with header_slot.container():
+    """Render the calculated header before streaming the profile charts."""
+    def header(health_score):
         render_astronaut_header(
             name="Dr. Amara Okafor",
             country_code="ng",
@@ -1620,6 +1611,8 @@ def render():
             age=42,
             height_cm=164,
             weight_kg=55.2,
-            health_score=calculated_score,
+            health_score=health_score,
             time_outside="01h 18m",
         )
+
+    graphs(render_header=header)

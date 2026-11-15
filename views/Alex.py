@@ -26,7 +26,7 @@ def render_astronaut_header(
     flag_url = f"https://flagcdn.com/w40/{country_code.lower()}.png"
 
     header_html = f"""
-    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px; padding: 4px 0; font-family: sans-serif;">
+    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px; padding: 4px 0; font-family: 'IBM Plex Sans', sans-serif;">
         <!-- 1. Name, Flag & Demographics -->
         <div>
             <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #888888; margin-bottom: 4px;">
@@ -79,7 +79,7 @@ def render_astronaut_header(
         with actions:
             render_header_actions("Alex", health_score)
 
-def graphs():
+def graphs(render_header=None):
     # ---------------------------------------------------------------------------
     # PAGE CONFIG & GLOBAL STYLES
     # ---------------------------------------------------------------------------
@@ -91,11 +91,10 @@ def graphs():
 
     CUSTOM_CSS = """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Barlow:wght@400;500;600&display=swap');
 
     :root {
-        --bg-page: #0C0E10;
-        --bg-card: #14171A;
+        --bg-page: #0b0f12;
+        --bg-card: #141b1f;
         --divider: #20262B;
         --text-primary: #F2F4F5;
         --text-secondary: #9AA5AD;
@@ -105,13 +104,9 @@ def graphs():
     }
 
     html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-        background:
-            radial-gradient(ellipse 85% 45% at 50% -8%, rgba(61, 220, 132, 0.085) 0%, rgba(12, 14, 16, 0) 68%),
-            radial-gradient(ellipse 65% 40% at 88% 18%, rgba(111, 211, 255, 0.055) 0%, rgba(12, 14, 16, 0) 60%),
-            linear-gradient(180deg, #101418 0%, #0C0E10 42%, #080A0C 100%) !important;
-        background-attachment: fixed !important;
+        background: var(--page-background) !important;
         color: var(--text-primary);
-        font-family: 'Barlow', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-variant-numeric: tabular-nums;
     }
 
@@ -127,7 +122,7 @@ def graphs():
 
     /* Section titles */
     .section-title {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 22px;
         font-weight: 600;
         color: var(--text-primary);
@@ -135,7 +130,7 @@ def graphs():
         letter-spacing: 0.01em;
     }
     .section-sub {
-        font-family: 'Barlow', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 13px;
         font-weight: 400;
         color: var(--text-muted);
@@ -162,7 +157,7 @@ def graphs():
     /* Tile card container (keyed containers + legacy selector) */
     [class*="st-key-tile"], [class*="st-key-hero"],
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: var(--bg-card) !important;
+        background: var(--surface-card) !important;
         border-radius: 22px !important;
         padding: 20px !important;
         border: none !important;
@@ -230,7 +225,7 @@ def graphs():
         left: 0;
         top: 24px;
         width: 245px;
-        background: #0C0E10;
+        background: #0b0f12;
         border: 1px solid #2A3138;
         border-radius: 12px;
         padding: 10px 12px;
@@ -287,7 +282,7 @@ def graphs():
         margin-bottom: 10px;
     }
     .metric-value {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 44px;
         font-weight: 600;
         color: var(--text-primary);
@@ -350,7 +345,7 @@ def graphs():
         pointer-events: none;
     }
     .hero-score-num {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 54px;
         font-weight: 600;
         line-height: 1.0;
@@ -377,7 +372,7 @@ def graphs():
     .pillar-box { display: flex; flex-direction: column; gap: 2px; }
     .pillar-name { font-size: 12px; color: var(--text-secondary); }
     .pillar-val {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
         font-size: 24px;
         font-weight: 600;
         color: var(--text-primary);
@@ -700,13 +695,13 @@ def graphs():
             hovermode="closest",
             hoverdistance=40,
             hoverlabel=dict(
-                bgcolor="#0C0E10", bordercolor="#20262B",
-                font=dict(family="Barlow, sans-serif", size=12, color="#F2F4F5"),
+                bgcolor="#0b0f12", bordercolor="#20262B",
+                font=dict(family="IBM Plex Sans, sans-serif", size=12, color="#F2F4F5"),
             ),
             xaxis=dict(
                 range=padded_x_range, tickmode="array", tickvals=tick_vals, ticktext=tick_text,
                 showgrid=False, zeroline=False, showline=False, fixedrange=True,
-                tickfont=dict(family="Barlow, sans-serif", size=11, color="#6E7A83"),
+                tickfont=dict(family="IBM Plex Sans, sans-serif", size=11, color="#6E7A83"),
             ),
             yaxis=dict(range=[y_floor, y_ceil], visible=False, showgrid=False, zeroline=False, fixedrange=True),
         )
@@ -771,6 +766,8 @@ def graphs():
 
     health_summary = compute_composite_index(df_day, df_30d, df_test, df_extra)
     st.session_state["health_summary_Alex"] = health_summary
+    if render_header is not None:
+        render_header(round(health_summary["overall"] / 10.0, 1))
     render_circular_hero(health_summary)
 
     # --- Section 1: live telemetry ---------------------------------------------
@@ -1111,14 +1108,8 @@ def graphs():
     return round(health_summary["overall"] / 10.0, 1)
 # --- Render Alex's Header ---
 def render():
-    # 1. Reserve the top spot on the page first
-    header_slot = st.empty()
-
-    # 2. Run graphs() and get the calculated score
-    calculated_score = graphs()
-
-    # 3. Render the header back into the reserved top spot
-    with header_slot.container():
+    """Render the calculated header before streaming the profile charts."""
+    def header(health_score):
         render_astronaut_header(
             name="Alex Vance",
             country_code="us",
@@ -1126,6 +1117,8 @@ def render():
             age=38,
             height_cm=182,
             weight_kg=74.5,
-            health_score=calculated_score,
+            health_score=health_score,
             time_outside="04h 18m",
         )
+
+    graphs(render_header=header)
