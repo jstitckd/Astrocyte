@@ -72,7 +72,7 @@ The dashboard displays the **12:00 entry** from the supplied diurnal CSV rather 
 
 ### Synthetic astronaut health data
 
-All astronaut health data were generated artificially using **Claude**. For each metric, the team supplied a relevant publication or NASA resource to inform the generated values and trends.
+All astronaut health data were generated artificially using **ChatGPT** based off of publically available research (see references). For each metric, the team supplied a relevant publication or NASA resource to inform the generated values and trends.
 
 These references provided scientific context; the displayed values are **not measurements extracted from those studies or records of real astronauts**. Providing research sources to an AI model does not validate its generated data.
 
