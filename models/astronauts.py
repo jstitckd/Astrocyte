@@ -11,7 +11,7 @@ class Astronaut:
 
 Astronauts = {
     "Amara": Astronaut("Dr. Amara Okafor", "93" ,"Medical Officer"),
-    "Alex": Astronaut("Alex Vance", "66", "Pilot"),
+    "Alex": Astronaut("Alex Vance", "65", "Pilot"),
     "Petrov": Astronaut("Petrov Volkov", "90", "Commander"),
     "Milou": Astronaut("Milou de Jong", "77", "Lead Engineer")
     # "Four": Astronaut("Greenhouse / common room", "❋"),
