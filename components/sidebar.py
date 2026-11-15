@@ -72,7 +72,7 @@ def _inject_sidebar_styles():
             }}
 
             /* Anchor the score to the button, not its label wrapper. */
-            {button} * {{
+            {button} > div {{
                 position: static !important;
                 transform: none !important;
             }}
@@ -242,6 +242,11 @@ def _inject_sidebar_styles():
                 transition: opacity 0.1s ease 0.22s;
             }}
 
+            /* Spacing strictly under the Dashboard button (between Dashboard and the first astronaut) */
+            {sidebar} .st-key-nav_home {{
+                margin-bottom: 1.25rem !important;
+            }}
+
             {sidebar} [data-testid="stButton"] button {{
                 height: auto !important;
                 min-height: 2.75rem !important;
@@ -308,10 +313,7 @@ def render_sidebar():
             '<div class="sidebar-dots" aria-hidden="true">⋮</div>',
             unsafe_allow_html=True,
         )
-
-        st.divider()
-        _nav("home", "⌂   Dashboard")
-        st.divider()
+        _nav("home", "⌂  Dashboard")
 
         st.markdown(
             '<h2 class="sidebar-section-heading">'
