@@ -1,19 +1,28 @@
-# Astrocyte — team template
+# Astrocyte
 
-A runnable Streamlit project with an original interactive seven-zone Mars outpost map. The habitat pages contain only their titles, ready for your team to build on. The purple branding, crew sidebar and existing crew pages are preserved. The map shows a concept habitat, not live systems telemetry.
+An open-source Streamlit prototype for exploring astronaut health, habitat tasks and Mars environmental conditions.
 
-## Run on your current Mac
+Built for the **2026 NASA Space Apps Challenge — Create Health Monitoring Software for Astronauts on Space Missions**.
 
-```bash
-cd /Users/aris/nasa_hackathon/Astrocyte
-.venv/bin/python -m streamlit run app.py
-```
+Astrocyte brings together a mission dashboard, four crew profiles, an interactive habitat map and medical task guides to help users explore how health monitoring could work during a long-duration space mission.
 
-Open the Local URL printed in the terminal, normally http://localhost:8501. Keep the terminal running; Ctrl+C stops the website. Use the Streamlit command above instead of VS Code's Run Python File button.
+**This prototype uses demo data. It is not a medical device, a validated clinical assessment or a live mission-monitoring system.**
 
-## Fresh setup — macOS / Linux
+## Features
 
-Install Python 3.12 and Git, then run:
+- Mission dashboard with compact crew health summaries and environmental gauges.
+- Profiles for Alex, Petrov, Amara and Milou, including telemetry, recovery and test charts.
+- Demonstration cycle-tracking views for Amara and Milou.
+- Profile insights and a demonstration test-entry form.
+- An AI-generated SVG habitat map with building highlights and task notifications that open relevant guides.
+- Urgency-coloured tasks with completion state maintained within each browser session.
+- A dark interface using IBM Plex Sans.
+
+## Run locally
+
+Use **Python 3.12**.
+
+### macOS / Linux
 
 ```bash
 git clone https://github.com/jstitckd/Astrocyte.git
@@ -24,9 +33,7 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-If `python3 --version` already reports Python 3.12, `python3 -m venv .venv` also works. Run commands from the folder containing `app.py` and `requirements.txt`. The shared GitHub repository must include this template change before your partners can clone it.
-
-## Fresh setup — Windows PowerShell
+### Windows PowerShell
 
 ```powershell
 git clone https://github.com/jstitckd/Astrocyte.git
@@ -37,109 +44,71 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-If activation is blocked, use the interpreter directly instead:
+Open the local URL printed in the terminal. To stop the app, press **Ctrl+C**.
 
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m streamlit run app.py
-```
+## Using the app
 
-Each developer creates one `.venv` inside their clone. Do not commit or share it. The separate environment in the parent `nasa_hackathon` folder is not used by this project.
+1. Open **Base overview** to view crew summaries, environmental conditions and the habitat map.
+2. Select an astronaut in the sidebar to explore their profile.
+3. Hover over or focus on habitat buildings to highlight them.
+4. Select a task notification to open its guide.
+5. Explore the demonstration test-entry and task-completion features.
 
-## VS Code
+## Data sources and limitations
 
-Open `Astrocyte.code-workspace`, install Microsoft's Python extension, and run **Python: Select Interpreter** from the Command Palette. Select this project's `.venv/bin/python` on Mac or `.venv\Scripts\python.exe` on Windows. Terminal activation and VS Code's selected interpreter are separate; selecting one does not necessarily update the other.
+Astrocyte combines Mars environmental data with synthetic astronaut health data. It does not receive live telemetry from astronauts or a Mars habitat.
 
-The workspace also provides **Run and Debug → Run Astrocyte** (requires the Python Debugger extension).
+### Environmental data
 
-## Homepage environment
+Environmental values were obtained for **14 November 2026** at **Syrtis Major, Mars (9.9°N, 70°E; elevation 1,624 m)**.
 
-The dashboard shows crew cards above the interactive habitat map, with environmental cards on its right. Outside temperature, pressure and UV index use `data/mars_diurnal_weather_radiation-v2.csv` at 12:00; cabin O₂ and CO₂ retain the synthetic scenario. Click a task marker to open its learning guide. Tasks persist in the current browser session. See [the homepage editing guide](docs/homepage-dashboard.md).
+- **Temperature and UV index:** obtained from NASA Goddard’s [Mars Explorer](https://psg.gsfc.nasa.gov/apps/mars/), which provides model-based Mars environmental information.
+- **Atmospheric pressure:** obtained from the [Mars Climate Database](https://www-mars.lmd.jussieu.fr/mcd_python/), configured for the same date and location.
+- **Cabin oxygen and carbon dioxide:** synthetic demonstration values.
 
-## Where to add your content
+The dashboard displays the **12:00 entry** from the supplied diurnal CSV rather than a live feed. Temperature and pressure represent outdoor conditions, not conditions inside the habitat.
 
-| Habitat space | Page file |
-| --- | --- |
-| Base overview / interactive map | `views/home.py` |
-| Main living & working quarters | `views/living.py` |
-| Environmental control & life support | `views/life_support.py` |
-| Science laboratories & maintenance workshops | `views/science.py` |
-| Exercise quarters | `views/exercise.py` |
-| Power generation & storage | `views/power.py` |
-| Greenhouse | `views/greenhouse.py` |
-| Spaceship & launch area | `views/launch.py` |
+**UV index is not a measure of ionising-radiation dose.** It does not represent exposure to galactic cosmic rays or solar energetic particles.
 
-The map's labelled space guide provides the same routes as the drawing. Hover/focus shows the area's description and facilities; clicking a building or guide entry opens its page. On mobile, a guide tap previews the area, then **Open space** navigates. Direct building taps also work.
+### Synthetic astronaut health data
 
-Existing crew routes (including `views/Alex.py`) and older health page files remain available; the new map does not overwrite them.
+All astronaut health data were generated artificially using **Claude**. For each metric, the team supplied a relevant publication or NASA resource to inform the generated values and trends.
 
-Every page has a small `render()` function. Add your Streamlit code below its title, inside that function. The homepage already calls `render_base_map()` and handles its selected destination. There is no common dashboard file to edit; each page can be developed independently.
+These references provided scientific context; the displayed values are **not measurements extracted from those studies or records of real astronauts**. Providing research sources to an AI model does not validate its generated data.
 
-```python
-# Example to add inside a page's render() function:
-st.write("Your content goes here.")
-```
+Health scores, recovery indicators and insights are demonstration outputs, not validated clinical assessments. The cited studies do not establish or validate Astrocyte’s scoring algorithms.
 
-The seven destination pages intentionally contain no sample widgets or placeholder instructions on screen.
+### Health-data references
 
-## Other folders
+| Metric or feature | Reference supplied to Claude |
+|---|---|
+| Heart rate | Fritsch-Yelle et al. (1996). Shuttle astronaut 24-hour heart rate and blood pressure study. *Journal of Applied Physiology*, 80, 910–914. |
+| Oxygen saturation | Conkin et al. (2017). Hemoglobin Oxygen Saturation with Mild Hypoxia and Microgravity. *Aerospace Medicine and Human Performance*, 88(6), 527–534. |
+| Cardiovascular load | Downs et al. Contributions of Astronauts Aerobic Exercise Intensity and Time on Change in VO₂peak during Spaceflight. [NASA NTRS 20140003747](https://ntrs.nasa.gov/citations/20140003747). |
+| Overnight heart-rate variability | Otsuka et al. (2021). Astronauts well-being and possibly anti-aging improved during long-duration spaceflight. *Scientific Reports*. |
+| Sleep score | Barger et al. (2014). Sleep deficiency and hypnotic use in astronauts before, during and after spaceflight. *The Lancet Neurology*. |
+| VO₂ max estimate | Moore et al. (2014). Peak Oxygen Uptake during and after Long-duration Space Flight. *Journal of Applied Physiology*, 117(3), 231–238. |
+| Dominant handgrip | Puglia et al. (2018). Long-Term Microgravity Effects on Isometric Handgrip and Precision Pinch Force. *International Journal of Aerospace Engineering*. [doi:10.1155/2018/1952630](https://doi.org/10.1155/2018/1952630). |
+| Reaction time | Dinges. Psychomotor Vigilance Self Test on ISS: Reaction Self Test on Expeditions 21 and 22. [NASA NTRS 20090029851](https://ntrs.nasa.gov/citations/20090029851). |
+| Hip bone density | Lang et al. (2006). Adaptation of the Proximal Femur to Skeletal Reloading After Long-Duration Spaceflight. *Journal of Bone and Mineral Research*. [doi:10.1359/jbmr.060509](https://doi.org/10.1359/jbmr.060509). |
+| Isometric mid-thigh pull | Strock et al. SpacePhys study poster, NASA Human Research Program. [NASA NTRS 20240000934](https://ntrs.nasa.gov/citations/20240000934). |
+| Seated leg press, row cable and chest cable | Lamoreaux and Landeck (2006). Mechanism Development, Testing, and Lessons Learned for the Advanced Resistive Exercise Device. [NASA NTRS 20060028227](https://ntrs.nasa.gov/citations/20060028227). |
+| Menstrual cycle | Jain and Wotring (2016). Medically induced amenorrhea in female astronauts. *npj Microgravity*, 2, 16008. |
 
-| File / folder | Purpose |
-| --- | --- |
-| `app.py` | Loads the styling and connects page IDs to their `render()` functions. |
-| `components/sidebar.py` | Shared logo and working navigation. Put future reusable widgets under `components/`. |
-| `models/areas.py` | `HABITAT_AREAS`: seven map destinations, labels, descriptions and facilities. Original `AREAS` remains for older pages. |
-| `models/metrics.py` | Empty metric dictionary for the team to define later. |
-| `frontend/styles.css` | Shared IBM Plex Sans font, page background, card surfaces and shell styling. |
-| `frontend/map/` | Editable map drawing (`index.html`), colours (`map.css`) and interactions (`map.js`). |
-| `components/base_map.py` | Embeds the map and validates building selections. |
-| `components/dashboard.py` | Homepage cabin cards and crew summaries. |
-| `services/dashboard.py` | Homepage snapshots and sample task assignments. |
-| `frontend/dashboard.css` | Homepage layout and responsive styling. |
-| `components/environment.py` | Reusable detailed environmental overview (not mounted on the homepage). |
-| `components/environment_charts.py` | Recorded Plotly profiles. |
-| `services/environment.py` | Parsing, provenance, cabin demo and units, adapted from `testing.py`. |
-| `frontend/environment.css` | Scoped environmental overview styling. |
-| `services/` | Environmental data processing and space for future validation/storage modules. |
-| `data/` | Synthetic crew telemetry and recovery CSVs. |
-| `tests/test_app.py` | Checks navigation, blank destination pages, map routes and event handling. |
-| `docs/` | Current architecture, interfaces and verification notes. |
-| `.streamlit/config.toml` | Streamlit theme and settings. |
-| `requirements.txt` | Python runtime dependencies. |
+These sources cover different mission conditions, study populations and research purposes. They should not be interpreted as a single validated dataset or as direct predictions of health during a Mars mission.
 
-The environmental overview uses Streamlit, pandas, Plotly and NumPy. All four are already pinned in `requirements.txt`; this feature adds no new dependencies.
+## AI assistance
 
-## Suggested four-person split
+- **Synthetic health data:** Claude generated demonstration values using the publications and NASA resources listed above as context since personal health data is private.
+- **Habitat map:** the SVG habitat illustration was AI assisted using ChatGPT
+- **Design and documentation:** ChatGPT assisted with dashboard design concepts and README drafting.
 
-- **Person 1:** `frontend/` and `views/home.py` — illustration, styling and map interactions.
-- **Person 2:** `views/life_support.py`, `power.py`, `data.py` and shared data services — coordinate contracts with page owners.
-- **Person 3:** `views/living.py`, `exercise.py` and `greenhouse.py` — crew habitat pages.
-- **Person 4:** `views/science.py`, `launch.py`, existing crew pages and shared integration in `app.py` and `models/areas.py`.
+AI-generated content is included as prototype material and should not be treated as independently verified scientific evidence.
 
-Coordinate changes to shared files before editing. See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch workflow and [docs/interfaces.md](docs/interfaces.md) for the small shared contract.
+## Third-party credits
 
-## Checks
+Astrocyte uses third-party software and assets, which remain subject to their respective licences.
 
-```bash
-python -m unittest discover -s tests -v
-```
-
-The 17 tests cover habitat/crew navigation, homepage summaries, task completion and persistence, environmental parsing, provenance, missing observations, optional channels, units and chart gaps. Desktop/mobile browser checks also cover task marker clicks and completion. See `docs/homepage-dashboard.md`.
-
-## What is deliberately absent
-
-The habitat illustration adds no live measurements. Its environmental overview uses a local CSV snapshot and a labelled cabin demo; no API connection, database, clinical thresholds or outdoor-readiness judgement is added. Missing channels are described in the data notes. The team's crew pages remain separate. Add these pieces as your team designs them.
-
-The previous full prototype remains recoverable from Git history (commit `aef6f9d`). The previously generated `docs/code-layout-guide.html` is preserved as a historical guide to that prototype; it does not describe this simplified layout. Use the current README and architecture notes for the skeleton.
-
-To customise the homepage map, begin with [frontend/map/README.md](frontend/map/README.md). Change colour variables in `map.css`, building positions and shapes in `index.html`, and interaction behaviour in `map.js`.
-
-The project keeps the Streamlit Community Cloud entry point `app.py`. Deployment instructions and team workflows are in the documentation; this local template change has not been pushed or deployed automatically.
-
-## Troubleshooting
-
-- **Missing `requirements.txt`:** `cd` into the `Astrocyte` repository folder first.
-- **`ModuleNotFoundError`:** select/activate this project's `.venv`, then install with `python -m pip install -r requirements.txt`.
-- **Underlined Streamlit import:** explicitly choose the `.venv` interpreter in VS Code.
-- **Cannot connect in the browser:** restart `python -m streamlit run app.py` and open the exact printed URL.
-- **Port already in use:** stop the old process with Ctrl+C or add `--server.port 8502` and use its printed URL.
+- **Streamlit:** application framework — https://streamlit.io/
+- **IBM Plex Sans:** interface typeface — https://github.com/IBM/plex
+- **Python dependencies:** listed in [requirements.txt](requirements.txt).

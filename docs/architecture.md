@@ -1,49 +1,29 @@
-# Current habitat-map architecture
+# Architecture
 
-`app.py` dispatches views and loads the shared purple branding. Existing crew pages and older health routes remain available. The homepage now has a seven-zone SVG habitat map, each with a title-only destination for the team to build on.
+Astrocyte is a single Streamlit app with a small static JavaScript component for the map. `app.py` loads the shared CSS, renders the sidebar and dispatches `st.session_state.page` to a view's `render()` function.
 
-| File | Responsibility |
-| --- | --- |
-| `views/home.py` | Composes cabin cards, map, crew summaries and session task list. |
-| `components/environment.py` | Cards, options, source badges and data notes. |
-| `components/environment_charts.py` | Recorded Plotly profiles, gaps and a selected-time marker. |
-| `services/environment.py` | Parsing/snapshot logic, provenance, cabin demo and display units. |
-| `frontend/environment.css` | Scoped overview styling. |
-| `components/base_map.py` | Passes metadata/accent into the iframe; validates and deduplicates returned navigation messages. |
-| `models/areas.py` | `HABITAT_AREAS` defines all seven spaces; original `AREAS` preserves older pages. |
-| `frontend/map/index.html` | Original isometric artwork: terrain, habitat links, service road and seven distinct facilities. |
-| `frontend/map/map.css` | Borderless map, labels, focus/hover highlights, space guide and mobile layout. |
-| `frontend/map/map.js` | Preview, accessible activation, mobile guide and Streamlit messaging. |
-| `views/living.py` | Main living and working quarters. |
-| `views/life_support.py` | Environmental control and life support. |
-| `views/science.py` | Labs and maintenance workshops. |
-| `views/exercise.py` | Exercise quarters; retains the existing exercise route. |
-| `views/power.py` | Power generation and storage. |
-| `views/greenhouse.py` | Greenhouse. |
-| `views/launch.py` | Spaceship and launch area. |
-| `components/sidebar.py` | Existing logo and crew navigation. |
-| `views/Alex.py`, `models/astronauts.py` | Team-owned crew work, preserved. |
-| `frontend/styles.css` | Shared page/brand styling; the user's logo spacing is retained. |
-| `tests/test_app.py` | Map/page contracts, legacy route smoke checks and crew navigation. |
+## Interface
 
-The older sleep, medical, nutrition, wellbeing and EVA view files are retained. The new map does not overwrite or repurpose them. There is no Streamlit automatic `pages/` directory.
+- `views/home.py` lays out crew cards, the map and one environmental panel.
+- `views/Alex.py`, `Petrov.py`, `Amara.py` and `Milou.py` load their CSV records, calculate the existing composite score and render the header before the charts. Profile data paths are anchored to the checkout, not the launch directory.
+- `components/astronaut_controls.py` provides summary and test-entry dialogs. Their data and test catalogue come from `services/astronaut_tools.py`. Test submission does not write records.
+- `views/task_guide.py` renders the selected task's preparation and instruction card. Guide content is in `models/task_guides.py`.
+- Registered habitat/older health destinations remain title-only views; they are not full monitoring systems.
 
-## Flow
+## Data and state
 
-The component receives all copy from `HABITAT_AREAS`. Hover/focus updates a local description card and selects the matching guide row. Activation sends `{area, event_id}` to Python. The validated area is placed in `st.session_state.page`, then Streamlit reruns and displays its registered view.
+`services/dashboard_weather.py` selects the noon row from the supplied hourly CSV and adds deterministic cabin gas values from `services/environment.py`. A reading retains its value, units and `csv`, `demo` or `missing` source. `services/environment_colours.py` defines configurable gauge scales; `components/environment_gauge.py` draws them.
 
-Only navigation state is added by the map. No health scores, system statuses, live data or operational readiness conclusions are generated. Descriptions explain the roles of concept facilities.
+`services/dashboard.py` supplies current crew snapshots and sample assignments. The displayed dashboard scores come from `models/astronauts.py`; the profile composite scores are computed independently in each profile module. They are separate implementations, not a shared clinical model.
 
-## Working on it
+Tasks are completed through `completed_habitat_tasks` in Streamlit session state. There is no database, authentication or cross-user task synchronization. Cached CSV reads are read-only.
 
-For illustration/styling, edit the commented zone groups in `frontend/map/index.html` and `map.css`. For page content, edit that zone's own view. For copy and labels, change `HABITAT_AREAS`. Adding a zone requires a registry entry, SVG region, registered view and updated integration/browser checks.
+## Map
 
-See `frontend/map/README.md` for exact IDs and interaction behaviour. `docs/code-layout-guide.html` is historical documentation for an earlier prototype and does not describe this map revision.
+`components/base_map.py` serves `frontend/map/` as a Streamlit custom component and passes habitat metadata, pending tasks, accent and background colours. Hover/focus or building clicks select a region. Task buttons post `{area, task, event_id}`; Python validates the assignment and prevents event replay before opening its guide. Multiple tasks at one building stack without covering each other.
 
-## Environmental overview
+## Styling
 
-The homepage uses `components/dashboard.py`, `services/dashboard.py` and `frontend/dashboard.css`; see `docs/homepage-dashboard.md`. `components/environment.py` retains the detailed overview for reuse and is not mounted on the homepage. It adapts the parser, tile/chart approach and cabin formulas from `testing.py` without importing that standalone script's page configuration or global CSS. The original script and weather CSV are unchanged.
+`frontend/styles.css` defines the shared font, page background and card surface. `frontend/dashboard.css` handles homepage cards; `frontend/astronaut_controls.css` and the dialog styles handle profile controls. Profile modules retain their own layout and Plotly styling. The map iframe has its own stylesheet and font import.
 
-CSV bytes pass through the pure service into a selected Sol/LMST `Snapshot`. Each `Reading` records a value, unit and `csv`, `demo` or `missing` source. Demo values are optional; recorded-channel dropouts are not backfilled. Profiles retain gaps and contain no forecast or health thresholds.
-
-Display choices are stored separately from widget keys so they survive navigation in the same Streamlit session. No source file is modified or database used. A file error shows a message while map navigation remains functional. See `docs/environment.md` for the accepted channels and monitoring gaps.
+There are no background workers or external measurement APIs. See [data/README.md](../data/README.md) for provenance and [deployment.md](deployment.md) for hosting.

@@ -18,3 +18,11 @@ runtime/
 *.db
 .agents/
 .codex/
+
+# Release/build artifacts and local diagnostics
+build/
+dist/
+*.egg-info/
+*.log
+*.bak
+*.tmp

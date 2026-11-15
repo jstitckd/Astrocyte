@@ -1,15 +1,13 @@
-# Logo and accent colour
+# Branding and theme
 
-The active sidebar logo combines the original lowercase `astrocyte.` text with the supplied purple astrocyte symbol. It is rendered in `components/sidebar.py`; sizing, spacing and text styling are in `frontend/styles.css`.
+- **Font:** IBM Plex Sans, loaded from Google Fonts with Arial/sans-serif fallbacks.
+- **Accent:** `#d093f6`, configured by `theme.primaryColor` in `.streamlit/config.toml`.
+- **Page background:** `#0b0f12`.
+- **Card surface:** gradient from `#141b1f` to `#11171b`.
+- **Raised task surface:** `#1d272d`.
 
-- **Symbol source:** `frontend/astrocyte-mark.png`, copied unchanged from the uploaded image.
-- **Text:** live text in the site's inherited Source Sans font, 29 px, weight 650, letter spacing −1.3 px.
-- **Accent:** `#d093f6`, sampled from the purple symbol.
+The sidebar wordmark is live text plus the team-supplied purple symbol in `frontend/astrocyte-mark.png`. `components/sidebar.py` frames that PNG in an SVG and filters neutral residue; `frontend/styles.css` sets its dimensions and typography. Replacing the symbol with a different crop may require changing `_brand_mark()`'s SVG viewport.
 
-`_brand_mark()` wraps the supplied bitmap in a small SVG viewport. Its browser colour filter keeps the purple silhouette and hides neutral white/black residue from the cutout. The PNG is not edited, and no external image service or local raster-processing script runs in the app. The icon displays on a transparent background alongside the live text.
+The map iframe uses `frontend/map/map.css`. Its terrain, glass and solar-panel colours are illustration materials, independent of the purple brand accent. Task urgency uses yellow/red independently of that accent.
 
-The SVG viewport is framed to this particular uploaded mark. If replacing it with a differently shaped or sized source, adjust the viewport and source dimensions in `_brand_mark()`.
-
-To change the main accent, edit `primaryColor` in `.streamlit/config.toml` using a six-digit hex value, then restart Streamlit. `app.py` supplies that colour to the shared CSS, the sidebar wrapper uses it for the symbol, and `components/base_map.py` passes it into the map. This updates the dot, primary buttons, focus states and map highlights together. Mars terrain colours are separate illustration colours in the map files.
-
-The previous full image `frontend/logo.png` is retained as a source reference; it is no longer displayed by the sidebar.
+See [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for font, flag, logo and data attribution/provenance.

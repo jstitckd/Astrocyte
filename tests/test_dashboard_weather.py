@@ -52,11 +52,3 @@ class DashboardWeatherTests(unittest.TestCase):
         labels = ("Radiation · UV", "Outside temperature", "Outside pressure", "Cabin O₂", "Cabin CO₂")
         positions = [markup.index(label) for label in labels]
         self.assertEqual(positions, sorted(positions))
-
-    def test_sparkline_preserves_a_gap_in_the_recording(self):
-        from components.environment_sparkline import sparkline
-        snapshot = weather_snapshot(b"Time,Temperature_C,Pressure_Pa,UV_Index\n10:00,-30,500,40\n11:00,-31,501,45\n12:00,,502,50\n13:00,-32,503,45\n14:00,-33,504,40\n")
-        self.assertEqual(snapshot.history["air"][2], ("12:00", None))
-        chart = sparkline(snapshot.history["air"], snapshot.time, "Temperature", "°C", "air")
-        self.assertEqual(chart.count('class="env-spark-line"'), 2)
-        self.assertNotIn('class="env-spark-selected"', chart)

@@ -1,34 +1,14 @@
-# Seven-zone habitat map
+# Habitat map component
 
-An original SVG scene with seven distinct spaces. `views/home.py` displays it through `components/base_map.py`.
+- `index.html`: original SVG illustration and explicit roof anchor points.
+- `map.css`: appearance, IBM Plex Sans, task positions and urgency styles.
+- `map.js`: Streamlit bridge, selection, task guide clicks and connectors.
+- `models/areas.py`: the seven habitat IDs, labels and metadata supplied by Python.
 
-| ID | Structure | Destination |
-| --- | --- | --- |
-| `living` | Three-module crew hub, common facilities and communications mast | `views/living.py` |
-| `life_support` | Utility module, tanks and pipework | `views/life_support.py` |
-| `science` | Laboratory, workshop, dish and rover | `views/science.py` |
-| `exercise` | Long training module with panoramic windows | `views/exercise.py` |
-| `power` | Solar banks, battery cabinet and service conduit | `views/power.py` |
-| `greenhouse` | Glazed growing hall with planted rows | `views/greenhouse.py` |
-| `launch` | Separate lander pad, access gantry and spacecraft | `views/launch.py` |
+Buildings highlight on hover, focus, click or keyboard activation; these actions do not navigate. Task cards open their task guide. Yellow left edges/badges mean pending and red means urgent. No icon or map reading establishes that a habitat is safe to enter.
 
-## Edit the design
+Task card placement is controlled by `.task-living`, `.task-science` and `.task-exercise`. `circle.task-anchor` coordinates (`cx`/`cy`) in the matching SVG building choose the roof attachment point. `drawTaskConnectors()` scales those points to the scene. The first exercise card has a horizontal connector; additional cards for the same building stack below it.
 
-- `index.html`: terrain, links, structures and label positions. Each numbered structure is in a commented `<g class="building" data-area="...">`; edit its `translate(x y)` to move it. Update any connecting paths when moving a structure.
-- `map.css`: appearance, hover/focus highlights, responsive guide and details card. The outer map has no border, and label text has no stroke outline.
-- `map.js`: preview, touch and keyboard behaviour, and the Streamlit message bridge.
-- `models/areas.py`: `HABITAT_AREAS` is the source of truth for full names, short labels, numbers, categories, descriptions and facility tags. The SVG's `data-area` IDs must match it.
+Python passes pending tasks and registered areas into the component. Task clicks send `{area, task, event_id}`. `components/base_map.py` validates the message and ignores a replayed event before changing the Streamlit route. Keep the IDs in the registry and SVG `data-area` attributes synchronized.
 
-Common artwork is in SVG symbols `cabin`, `water-tank`, `solar-bank` and `stone`. Each zone combines those with its own geometry. The greenhouse and lander have dedicated drawings. There are no image files, external fonts, CDNs or build tools required for the map.
-
-The main purple comes from `theme.primaryColor` in `.streamlit/config.toml`. The illustration's warm terrain, green glass and blue solar panels are separate materials; selection uses a purple footprint highlight without recolouring the structures.
-
-## Interaction
-
-Task card positions are set by `.task-living`, `.task-science` and `.task-exercise` in `map.css`. Connector endpoints are explicit `circle.task-anchor` roof points inside those building groups in `index.html`; adjust their `cx`/`cy` to change the attachment point. `drawTaskConnectors()` in `map.js` draws the lines between the cards and those points as the map resizes. The first exercise card is vertically aligned with its roof anchor automatically, making its connector horizontal; change its `left` value to move the card sideways. Additional tasks for the same building stack below the first with separate connectors so the notifications remain readable.
-
-Hover or keyboard focus highlights a building. Clicking a building opens its page; Enter and Space also work. The Explore the outpost panel, guide list and detail card have been removed, and the illustration fills the available width.
-
-On touch screens, tap a building to open its page directly. Reduced-motion preferences disable hover transitions.
-
-Building clicks send `{area, event_id}` to Python. Task cards send `{area, task, event_id}` and open the task learning page; `models/task_guides.py` holds the editable steps. The wrapper validates the habitat ID and rejects a replayed event, so returning home does not reopen the last selection. The seven target pages are title-only workspaces for the team. Existing crew navigation and old health pages are preserved.
+The illustration requires no image downloads or build tools. Google Fonts is an external request; the supplied font fallback remains usable without it.

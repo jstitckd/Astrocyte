@@ -20,7 +20,7 @@ AREAS = {
 
 @dataclass(frozen=True)
 class HabitatArea:
-    """Map content, shared by labels, the space guide and page titles."""
+    """Map metadata, shared by building labels and habitat page titles."""
 
     code: str
     name: str

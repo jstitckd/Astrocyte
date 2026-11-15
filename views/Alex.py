@@ -421,8 +421,7 @@ def graphs(render_header=None):
         return sorted(set(int(round(v)) for v in np.linspace(0, n - 1, count)))
 
     def resolve_csv(filename: str) -> Path:
-        data_path = Path("data") / filename
-        return data_path if data_path.exists() else Path(filename)
+        return Path(__file__).resolve().parents[1] / "data" / filename
 
     @st.cache_data
     def load_data():
@@ -747,7 +746,7 @@ def graphs(render_header=None):
                 """),
                 unsafe_allow_html=True,
             )
-            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False, "staticPlot": False})
+            st.plotly_chart(fig, width="stretch", config={"displayModeBar": False, "staticPlot": False})
 
             subrows_html = ""
             if subrows:

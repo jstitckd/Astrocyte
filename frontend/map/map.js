@@ -92,14 +92,6 @@
     requestAnimationFrame(resize);
   }
 
-  function openArea(id) {
-    if (disabled || !areas.has(id)) return;
-    send("streamlit:setComponentValue", {
-      value: {area: id, event_id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)},
-      dataType: "json",
-    });
-  }
-
   buildings.forEach(building => {
     const id = building.dataset.area;
     building.addEventListener("mouseenter", () => { if (!touch) selectArea(id); });
@@ -129,7 +121,7 @@
       const area = areas.get(building.dataset.area);
       building.setAttribute("aria-disabled", String(disabled || !area));
       if (!area) return;
-      building.setAttribute("aria-label", "Open " + area.name + " page");
+      building.setAttribute("aria-label", "Explore " + area.name);
       building.setAttribute("aria-description", area.description);
       building.querySelector(".label-name").textContent = area.label;
       building.querySelector(".label-code").textContent = area.code;
@@ -140,7 +132,7 @@
     requestAnimationFrame(resize);
   });
 
-  if (touch) document.getElementById("map-instructions").textContent = "Tap a building to open its page";
+  if (touch) document.getElementById("map-instructions").textContent = "Tap a building to highlight it";
   new ResizeObserver(() => requestAnimationFrame(resize)).observe(document.querySelector(".map-shell"));
   document.fonts.ready.then(resize);
   send("streamlit:componentReady", {apiVersion: 1});
