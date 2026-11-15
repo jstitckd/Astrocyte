@@ -68,7 +68,6 @@ The dashboard shows crew cards above the interactive habitat map, with environme
 | Power generation & storage | `views/power.py` |
 | Greenhouse | `views/greenhouse.py` |
 | Spaceship & launch area | `views/launch.py` |
-| Data & exports | `views/data.py` |
 
 The map's labelled space guide provides the same routes as the drawing. Hover/focus shows the area's description and facilities; clicking a building or guide entry opens its page. On mobile, a guide tap previews the area, then **Open space** navigates. Direct building taps also work.
 
@@ -129,7 +128,7 @@ The 17 tests cover habitat/crew navigation, homepage summaries, task completion 
 
 ## What is deliberately absent
 
-The habitat illustration adds no live measurements. Its environmental overview uses a local CSV snapshot and a labelled cabin demo; no API connection, database, clinical thresholds or outdoor-readiness judgement is added. Missing channels are described in the data notes. The team's crew pages remain separate. The **Data & exports** destination is a blank page name, not an implemented feature. Add these pieces as your team designs them.
+The habitat illustration adds no live measurements. Its environmental overview uses a local CSV snapshot and a labelled cabin demo; no API connection, database, clinical thresholds or outdoor-readiness judgement is added. Missing channels are described in the data notes. The team's crew pages remain separate. Add these pieces as your team designs them.
 
 The previous full prototype remains recoverable from Git history (commit `aef6f9d`). The previously generated `docs/code-layout-guide.html` is preserved as a historical guide to that prototype; it does not describe this simplified layout. Use the current README and architecture notes for the skeleton.
 

@@ -23,7 +23,6 @@
 | `views/launch.py` | Spaceship and launch area. |
 | `components/sidebar.py` | Existing logo and crew navigation. |
 | `views/Alex.py`, `models/astronauts.py` | Team-owned crew work, preserved. |
-| `views/data.py` | Existing blank data page. |
 | `frontend/styles.css` | Shared page/brand styling; the user's logo spacing is retained. |
 | `tests/test_app.py` | Map/page contracts, legacy route smoke checks and crew navigation. |
 

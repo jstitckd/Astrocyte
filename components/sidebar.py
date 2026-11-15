@@ -330,8 +330,6 @@ def render_sidebar():
                 f"*{astronaut.role}*",
             )
 
-        st.divider()
-        _nav("data", "↧   Data & References")
 
 
 def _nav(page, label):

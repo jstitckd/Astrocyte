@@ -11,7 +11,7 @@ Before adding data, agree on:
 - Separation of imported measurements from self-reported entries.
 - Storage ownership, persistence and export behaviour.
 
-Put shared definitions in `models/`, processing and storage in `services/`, safe sample files in `data/`, reusable controls in `components/` and the import/export interface in `views/data.py`.
+Put shared definitions in `models/`, processing and storage in `services/`, safe sample files in `data/`, reusable controls in `components/`.
 
 Keep provider keys outside Git, in environment variables or `.streamlit/secrets.toml`. No credentials are needed to run the skeleton.
 

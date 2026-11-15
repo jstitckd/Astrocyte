@@ -63,4 +63,4 @@ Use one station and one row per Sol/start time. The parser rejects duplicate obs
 
 The service returns a `Snapshot` with `Reading(value, unit, source, note)` objects. `source` is `csv`, `demo` or `missing`. Recorded channels take precedence over demo formulas. A file error shows a message while keeping habitat-map navigation available.
 
-No upload screen, API, database or persistent record storage is added by this change. The existing Data & exports page remains a separate team workspace. Display preferences use Streamlit session state; loading the overview does not modify the source CSV.
+No upload screen, API, database or persistent record storage is added by this change. Display preferences use Streamlit session state; loading the overview does not modify the source CSV.

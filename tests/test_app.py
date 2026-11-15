@@ -24,7 +24,6 @@ class NavigationTests(unittest.TestCase):
             "nutrition": "Kitchen",
             "wellbeing": "Greenhouse / common room",
             "eva": "Airlock / EVA area",
-            "data": "Data & exports",
             **{area_id: area.name for area_id, area in HABITAT_AREAS.items()},
         }
         self.assertFalse(app.exception)

@@ -11,7 +11,7 @@ def render():
     styles = (Path(__file__).resolve().parents[1] / "frontend/dashboard.css").read_text()
     st.html(f"<style>{styles}</style>")
     with st.container(key="home_dashboard"):
-        st.title("Dashboard")
+        st.title("Dashboard", anchor=False)
         tasks = pending_tasks()
         with st.container(key="crew_overview"):
             st.html('<h2 class="crew-heading">Crew health</h2>')
