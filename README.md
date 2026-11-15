@@ -54,7 +54,7 @@ Open the local URL printed in the terminal. To stop the app, press **Ctrl+C**.
 4. Select a task notification to open its guide.
 5. Explore the demonstration test-entry and task-completion features.
 
-## Data sources and limitations
+## Data sources and References
 
 Astrocyte combines Mars environmental data with synthetic astronaut health data. It does not receive live telemetry from astronauts or a Mars habitat.
 
@@ -80,7 +80,7 @@ Health scores, recovery indicators and insights are demonstration outputs, not v
 
 ### Health-data references
 
-| Metric or feature | Reference supplied to Claude |
+| Metric or feature | Reference |
 |---|---|
 | Heart rate | Fritsch-Yelle et al. (1996). Shuttle astronaut 24-hour heart rate and blood pressure study. *Journal of Applied Physiology*, 80, 910–914. |
 | Oxygen saturation | Conkin et al. (2017). Hemoglobin Oxygen Saturation with Mild Hypoxia and Microgravity. *Aerospace Medicine and Human Performance*, 88(6), 527–534. |
@@ -99,7 +99,7 @@ These sources cover different mission conditions, study populations and research
 
 ## AI assistance
 
-- **Synthetic health data:** Claude generated demonstration values using the publications and NASA resources listed above as context since personal health data is private.
+- **Synthetic health data:** ChatGPT generated demonstration values using the publications and NASA resources listed above as context since personal health data is private.
 - **Habitat map:** the SVG habitat illustration was AI assisted using ChatGPT
 - **Design and documentation:** ChatGPT assisted with dashboard design concepts and README drafting.
 
