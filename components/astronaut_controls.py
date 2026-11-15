@@ -286,11 +286,9 @@ def summary_dialog(astronaut_id, health_score):
             _html(f"""
             <div class="dlg-header">
                 <div>
-                    <div class="dlg-eyebrow">Crew Biometric Brief</div>
+                    <div class="dlg-eyebrow"></div>
                     <div class="dlg-title">{astronaut.name}</div>
-                    <div class="dlg-meta">
-                        Telemetry: {day['date']} · {str(day['time_station_clock'])[:5]} &nbsp;|&nbsp; Recovery log: {recovery['date']}
-                    </div>
+                    <div class="dlg-meta"></div>
                 </div>
             </div>
 
@@ -357,11 +355,11 @@ def summary_dialog(astronaut_id, health_score):
             _html(f"""
             <div class="dlg-panel-grid">
                 <div class="dlg-panel">
-                    <div class="dlg-panel-title">Telemetry insights</div>
+                    <div class="dlg-panel-title">Insights</div>
                     <ul class="dlg-list">{insights_items}</ul>
                 </div>
                 <div class="dlg-panel">
-                    <div class="dlg-panel-title">Flight surgeon actions</div>
+                    <div class="dlg-panel-title">Recommended Actions</div>
                     <ul class="dlg-list rec">{rec_items}</ul>
                 </div>
             </div>
@@ -381,9 +379,7 @@ def test_log_dialog(astronaut_id):
         _html(f"""
         <div class="dlg-header">
             <div>
-                <div class="dlg-eyebrow">Manual Biometric Entry</div>
                 <div class="dlg-title">{astronaut.name}</div>
-                <div class="dlg-meta">Record a clinical, strength, or station telemetry observation</div>
             </div>
         </div>
         """),
