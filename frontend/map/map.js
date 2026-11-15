@@ -94,12 +94,11 @@
     const id = building.dataset.area;
     building.addEventListener("mouseenter", () => { if (!touch) selectArea(id); });
     building.addEventListener("focus", () => selectArea(id));
-    building.addEventListener("click", () => { selectArea(id); openArea(id); });
+    building.addEventListener("click", () => { selectArea(id);});
     building.addEventListener("keydown", event => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         selectArea(id);
-        openArea(id);
       }
     });
   });
